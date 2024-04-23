@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 import os
-import preprocess_data,  utilities, hydro, hydro_utils, read
+import preprocess_data,  utilities, hydro, hydro_utils, read, export
 
 
 plt.close("all")
@@ -22,7 +22,7 @@ Parse command-line arguments
 """
 parser = argparse.ArgumentParser(description='Run hydro without any optimization.')
 
-parser.add_argument('-d','--days', default=3, help='(int) Number of outermost iterations of the fipy solver, be it steadystate or transient. Default=10.', type=int)
+parser.add_argument('-d','--days', default=1, help='(int) Number of outermost iterations of the fipy solver, be it steadystate or transient. Default=10.', type=int)
 parser.add_argument('-b','--nblocks', default=0, help='(int) Number of blocks to locate. Default=5.', type=int)
 parser.add_argument('-n','--niter', default=1, help='(int) Number of repetitions of the whole computation. Default=10', type=int)
 args = parser.parse_args()
@@ -31,18 +31,38 @@ DAYS = args.days
 N_BLOCKS = args.nblocks
 N_ITER = args.niter
 
+cum_Vdp_nodams = 21088.453521509597 # Value of dry peat volume without any blocks, without any precipitation for 3 days. Normalization.
+track_WT_drained_area = (314,488) # datasetv1_AP 
+track_WT_notdrained_area = (243,651) # datasetv1_AP 
+hand_made_dams = False # compute performance of cherry-picked locations for dams.
 
 """
 Read and preprocess data
 """
 
-preprocessed_datafolder = os.path.abspath('./data/original_data')
-dem_rst_fn = os.path.join(preprocessed_datafolder, 'DTM_metres_clip.tif') 
-can_rst_fn = os.path.join(preprocessed_datafolder, 'canals_clip.tif')
-peat_depth_rst_fn = os.path.join(preprocessed_datafolder, 'Peattypedepth_clip.tif') # peat depth, peat type in the same raster
+# # preprocessed_datafolder = r"/data/dataset_v1"
+dem_rst_fn = r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/drained_peat_canal_block/data/sugihan-lumpur_data/dsm_alos_3d_oki.tif" #r"data/dataset_v1/11Dataset_v1new/DatasetV1-new/srtm_clipped_DI_res.tif" #preprocessed_datafolder + r"/02Elevasi/Demnas_KHG_SL.tif" 
+can_rst_fn = r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/drained_peat_canal_block/data/sugihan-lumpur_data/canal_new_res.tif"  #preprocessed_datafolder + r"/03CanalNetwork/Canal_rcl_F.tif"
+peat_depth_rst_fn = r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/drained_peat_canal_block/data/sugihan-lumpur_data/peattype_new_res.tif" #preprocessed_datafolder + r"/04Peat/Peat depth.tif" # peat depth, peat type in the same raster
 
-abs_path_data = os.path.abspath('./data/original_data') # Absolute path to data folder needed for Excel file with parameters
-params_fn = os.path.join(abs_path_data, 'params.xlsx')
+# <<<<<<< HEAD
+# # abs_path_data = os.path.abspath('/data') # Absolute path to data folder needed for Excel file with parameters
+params_fn = r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/drained_peat_canal_block/data/sugihan-lumpur_data/params.xlsx" #abs_path_data + r"/params.xlsx"
+rainfall_fn = r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/drained_peat_canal_block/data/sugihan-lumpur_data/2023_rainfall_plm.xlsx" #r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/peat_canal_block/python3/data/dataset_v1/06Rainfall/2023_rainfall_plm.xlsx"
+# =======
+# abs_path_data = os.path.join(os.getcwd(), "data") # Absolute path to data folder needed for Excel file with parameters
+# params_fn = os.path.join(abs_path_data, "params.xlsx")
+# rainfall_fn = os.path.join(abs_path_data, "2012_rainfall.xlsx") # or dataset_v1/06Rainfall/2023_rainfall_plm.xlsx"
+# >>>>>>> fd385068ab27619ef1df48902592708936d56bde
+
+# preprocessed_datafolder = r"/data/dataset_v1"
+# dem_rst_fn = r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/peat_canal_block/python3/data/Strat4/DTM_metres_clip.tif" #preprocessed_datafolder + r"/02Elevasi/Demnas_KHG_SL.tif" 
+# can_rst_fn = r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/peat_canal_block/python3/data/Strat4/canals_clip.tif"  #preprocessed_datafolder + r"/03CanalNetwork/Canal_rcl_F.tif"
+# peat_depth_rst_fn = r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/peat_canal_block/python3/data/Strat4/Peattypedepth_clip.tif" #preprocessed_datafolder + r"/04Peat/Peat depth.tif" # peat depth, peat type in the same raster
+
+# abs_path_data = os.path.abspath('/data') # Absolute path to data folder needed for Excel file with parameters
+# params_fn = r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/peat_canal_block/python3/data/params.xlsx" #abs_path_data + r"/params.xlsx"
+
 
 # Read rasters, build up canal connectivity adjacency matrix
 if 'CNM' and 'cr' and 'c_to_r_list' not in globals(): # call only if needed
@@ -56,9 +76,9 @@ BLOCK_HEIGHT = PARAMS_df.block_height[0]; CANAL_WATER_LEVEL = PARAMS_df.canal_wa
 DIRI_BC = PARAMS_df.diri_bc[0]; HINI = PARAMS_df.hini[0];
 ET = PARAMS_df.ET[0]; TIMESTEP = PARAMS_df.timeStep[0]; KADJUST = PARAMS_df.Kadjust[0]
 
-P = read.read_precipitation() # precipitation read from separate historical data
+# Read precipitation
+P = read.read_precipitation(rainfall_fn) # precipitation read from separate historical data
 ET = ET * np.ones(shape=P.shape)
-
 
 # Even if maps say peat depth is less than 2 meters, the impermeable bottom is at most at 2m.
 # This can potentially break the hydrological simulation if the WTD would go below 2m.
@@ -76,7 +96,7 @@ boundary_mask = utilities.peel_raster(dem, catchment_mask)
 catchment_mask[boundary_mask] = False
 
 # soil types, soil physical properties and soil depth:
-peat_type_masked = peat_type_arr * catchment_mask
+peat_type_masked = peat_type_arr*catchment_mask
 peat_bottom_elevation = - peat_depth_arr * catchment_mask # meters with respect to dem surface. Should be negative!
 
 # Load peatmap soil types' physical properties dictionary.
@@ -97,8 +117,6 @@ n_canals = len(c_to_r_list)
 
 oWTcanlist = [x - CANAL_WATER_LEVEL for x in srfcanlist]
 
-hand_made_dams = True # compute performance of cherry-picked locations for dams.
-
 """
 MonteCarlo
 """
@@ -118,6 +136,7 @@ for i in range(0,N_ITER):
         damLocation = hand_picked_dams
     
     wt_canals = utilities.place_dams(oWTcanlist, srfcanlist, BLOCK_HEIGHT, damLocation, CNM)
+    
     """
     #########################################
                     HYDROLOGY
@@ -156,7 +175,6 @@ for i in range(0,N_ITER):
     
     water_blocked_canals = sum(np.subtract(wt_canals[1:], oWTcanlist[1:]))
     
-    cum_Vdp_nodams = 21088.453521509597 # Value of dry peat volume without any blocks, without any precipitation for 3 days. Normalization.
     print('dry_peat_volume(%) = ', dry_peat_volume/cum_Vdp_nodams * 100. , '\n',
           'water_blocked_canals = ', water_blocked_canals)
 
@@ -164,18 +182,19 @@ for i in range(0,N_ITER):
     Final printings
     """
     fname = r'output/results_mc_3_cumulative.txt'
-    if N_ITER > 20:  # only if big enough number of simulated days
+    if N_ITER > 0:  # only if big enough number of simulated days
         with open(fname, 'a') as output_file:
             output_file.write(
                                 "\n" + str(i) + "    " + str(dry_peat_volume) + "    "
                                 + str(N_BLOCKS) + "    " + str(N_ITER) + "    " + str(DAYS) + "    "
                                 + str(time.ctime()) + "    " + str(water_blocked_canals)
                               )
+
 """
 Save WTD data if simulating a year
 """
 fname = r'output/wtd_year_' + str(N_BLOCKS) + '.txt'
-if DAYS > 300:
+if DAYS > 2:
    with open(fname, 'a') as output_file:
        output_file.write("\n %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n" +
                              str(time.ctime()) + " nblocks = " + str(N_BLOCKS) + " ET = " + str(ET[0]) +

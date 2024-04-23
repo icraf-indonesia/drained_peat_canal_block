@@ -49,13 +49,12 @@ def ReadInput(filename):
 
     return n_nodes, peat_height, height, block_height, n_blocks, n_canals, nodes_per_canal, originalWTcanal, srfccanal
 
-def read_precipitation():
+def read_precipitation(rainfall_fn):
     """
-    Reads Pekanbaru airport 2012 weather data.
     Returns numpy array with 2012 (1 year) daily values 
     """
-    rainfall_fn = r"data/original_data/2012_rainfall.xlsx"
-    df = pd.read_excel(rainfall_fn, names=['', 'RAW_DATA','Fill_nodata','','','','',''])
+    # rainfall_fn = r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/peat_canal_block/python3/data/dataset_v1/06Rainfall/2023_rainfall_plm.xlsx" #r"/data/2012_rainfall.xlsx"
+    df = pd.read_excel(rainfall_fn, names=['','RAW_DATA','Fill_nodata','','','','',''])
     return df['Fill_nodata'].to_numpy()
     
     

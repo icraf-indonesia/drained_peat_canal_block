@@ -11,7 +11,7 @@ import scipy.sparse
 import pandas as pd
 
 
-def read_params(fn=r"/home/inaki/GitHub/dd_winrock/data/params.xlsx"):
+def read_params(fn=r"/data/params.xlsx"):
     df = pd.read_excel(fn)
     return df
 
@@ -161,4 +161,9 @@ def gen_can_matrix_and_raster_from_raster(can_rst_fn, dem_rst_fn):
 #    pickle_folder = r"C:\Users\L1817\Winrock"
 #    with open(pickle_folder + r'\50x50_DEM_and_canals.pkl', 'w') as f:
 #        pickle.dump([cm, cr, c_to_r_list], f)
+
+##########################################################
+
+
+
 
