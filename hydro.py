@@ -14,7 +14,6 @@ Created on Thu Nov 22 15:34:44 2018
 import numpy as np
 import fipy as fp
 import matplotlib.pyplot as plt
-import pandas as pd
 import copy
 from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable # for plots 
 
@@ -63,11 +62,7 @@ def plot_line_of_peat(raster, y_value, title, nx, ny, label, color, linewidth=1.
     
     return 0
         
-######################    
-# track_WT_drained_area = main.track_WT_drained_area # datasetv1_AP 
-# track_WT_notdrained_area = main.track_WT_notdrained_area # datasetv1_AP 
-
-######################
+    
 
 def hydrology(solve_mode, nx, ny, dx, dy, days, ele, phi_initial, catchment_mask, wt_canal_arr, boundary_arr,
               peat_type_mask, httd, tra_to_cut, sto_to_cut, 
@@ -94,11 +89,8 @@ def hydrology(solve_mode, nx, ny, dx, dy, days, ele, phi_initial, catchment_mask
 #    dneg = []
    
     # define location of points whose WTD to track in the dem
-    # track_WT_drained_area = (239,166) # blopti dataset
-    # track_WT_notdrained_area = (522,190) # blopti dataset
-    
-    track_WT_drained_area = (314,488) # datasetv1_AP 
-    track_WT_notdrained_area = (243,651) # datasetv1_AP 
+    track_WT_drained_area = (239,166)
+    track_WT_notdrained_area = (522,190)
     
     ele[~catchment_mask] = 0.
     ele = ele.flatten()
@@ -181,7 +173,7 @@ def hydrology(solve_mode, nx, ny, dx, dy, days, ele, phi_initial, catchment_mask
                 raster4=(ele-phi.value).reshape(ny,nx)
                 )
         # for later cross-section plots
-        y_value=500
+        y_value=270
 
         
 #        print "first cross-section plot"
