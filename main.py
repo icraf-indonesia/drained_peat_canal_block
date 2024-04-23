@@ -49,6 +49,7 @@ peat_depth_rst_fn = r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/drained_peat_ca
 # # abs_path_data = os.path.abspath('/data') # Absolute path to data folder needed for Excel file with parameters
 params_fn = r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/drained_peat_canal_block/data/sugihan-lumpur_data/params.xlsx" #abs_path_data + r"/params.xlsx"
 rainfall_fn = r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/drained_peat_canal_block/data/sugihan-lumpur_data/2023_rainfall_plm.xlsx" #r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/peat_canal_block/python3/data/dataset_v1/06Rainfall/2023_rainfall_plm.xlsx"
+
 # =======
 # abs_path_data = os.path.join(os.getcwd(), "data") # Absolute path to data folder needed for Excel file with parameters
 # params_fn = os.path.join(abs_path_data, "params.xlsx")
