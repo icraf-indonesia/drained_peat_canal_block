@@ -26,18 +26,20 @@ Before the model can be used, there are installation steps that you need to foll
 conda create -n [name of environment] python=3 fipy rasterio pandas xlrd
 ```
 
-3. Activate the new environment created 
-```
+3.  Activate the new environment created
+
+```         
 conda activate [name of environment]
 ```
 
-4. To run the model, you can utilize an integrated development environment (IDE) like Spyder. Here's a step-by-step guide to installing Spyder via conda.
+4.  To run the model, you can utilize an integrated development environment (IDE) like Spyder. Here's a step-by-step guide to installing Spyder via conda.
 
 ```         
 conda create -c conda-forge -n spyder-env spyder numpy scipy pandas matplotlib sympy cython
 ```
 
 ### Check when the model is properly installed
+
 To verify the installation, launch an interactive Python environment (e.g., Spyder) and attempt to run the main.py file as provided.
 
 If an error message occurs, please investigate and refer to the *common error* solution [WILL PREPARED SOON]. If the error persists, attempt to debug the script.
@@ -52,4 +54,5 @@ The script needs the following data to run:
 4.  Daily precipitation data for a year of selected period of time
 
 ## Reference
-Urzainki, I., Laurén, A., Palviainen, M., Haahti, K., Budiman, A., Basuki, I., Netzer, M. and Hökkä, H., 2020. Canal blocking optimization in restoration of drained peatlands. Biogeosciences, 17(19), pp.4769-4784.
+
+Urzainki, I., LaurC)n, A., Palviainen, M., Haahti, K., Budiman, A., Basuki, I., Netzer, M. and HC6kkC\$, H., 2020. Canal blocking optimization in restoration of drained peatlands. Biogeosciences, 17(19), pp.4769-4784.
