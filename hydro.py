@@ -61,6 +61,33 @@ def plot_line_of_peat(raster, y_value, title, nx, ny, label, color, linewidth=1.
     plt.legend(fontsize='x-large')
     
     return 0
+  
+def get_rasters(ny, nx, peat_type_mask, gwt, httd, tra_to_cut, cmask, drmask_not, ele, wt_canal_arr, dr, catchment_mask):
+    """
+    Compute and return the four raster arrays used in the big_4_raster_plot function.
+
+    Args:
+        ny (int): Number of rows in the raster arrays.
+        nx (int): Number of columns in the raster arrays.
+        peat_type_mask (numpy.ndarray): Mask array indicating the peat type.
+        gwt (numpy.ndarray): Groundwater table elevation array.
+        httd (dict): Dictionary containing peat hydraulic properties.
+        tra_to_cut (numpy.ndarray): Transmissivity values to cut.
+        cmask (fipy.CellVariable): Cell variable mask array.
+        drmask_not (fipy.CellVariable): Cell variable mask array for non-drain cells.
+        ele (numpy.ndarray): Elevation array.
+        wt_canal_arr (numpy.ndarray): Canal water table elevation array.
+        dr (numpy.ndarray): Drain mask array.
+        catchment_mask (numpy.ndarray): Catchment mask array.
+
+    Returns:
+        tuple: A tuple containing the four raster arrays (rast_D, rast_cwl, rast_dem, rast_elev_phi).
+    """
+    rast_D = ((hydro_utils.peat_map_h_to_tra(soil_type_mask=peat_type_mask, gwt=gwt, h_to_tra_and_C_dict=httd) - tra_to_cut) * cmask.value * drmask_not.value).reshape(ny, nx)
+    rast_cwl = (ele.reshape(ny, nx) - wt_canal_arr) * dr * catchment_mask
+    rast_dem = ele.reshape(ny, nx)
+    rast_elev_phi = gwt.reshape(ny, nx)
+    return rast_D, rast_cwl, rast_dem, rast_elev_phi
         
     
 
@@ -166,12 +193,16 @@ def hydrology(solve_mode, nx, ny, dx, dy, days, ele, phi_initial, catchment_mask
     
     
     if plotOpt:
+        # Get raster arrays before the computation
+        rast_D_before, rast_cwl_before, rast_dem_before, rast_elev_phi_before = get_rasters(ny, nx, peat_type_mask, phi.value - ele, httd, tra_to_cut, cmask, drmask_not, ele, wt_canal_arr, dr, catchment_mask)
+    
+        # Plot raster arrays before the computation
         big_4_raster_plot(title='Before the computation',
-                raster1=((hydro_utils.peat_map_h_to_tra(soil_type_mask=peat_type_mask, gwt=(phi.value - ele), h_to_tra_and_C_dict=httd) - tra_to_cut)*cmask.value *drmask_not.value ).reshape(ny,nx),
-                raster2=(ele.reshape(ny,nx) - wt_canal_arr) * dr * catchment_mask,
-                raster3=ele.reshape(ny,nx),
-                raster4=(ele-phi.value).reshape(ny,nx)
-                )
+                        raster1 =rast_D_before,
+                        raster2 =rast_cwl_before,
+                        raster3 =rast_dem_before,
+                        raster4 =rast_elev_phi_before)
+        plt.show()
         # for later cross-section plots
         y_value=270
 
@@ -306,15 +337,18 @@ def hydrology(solve_mode, nx, ny, dx, dy, days, ele, phi_initial, catchment_mask
 #        plot_raster_by_value((ele-phi.value).reshape(ny,nx), title="ele-phi in the end, colour keys", bottom_value=0.5, top_value=0.01)
         
         
-        
-    
     if plotOpt:
+        # Get raster arrays after the computation
+        rast_D_after, rast_cwl_after, rast_dem_after, rast_elev_phi_after = get_rasters(ny, nx, peat_type_mask, phi.value - ele, httd, tra_to_cut, cmask, drmask_not, ele, wt_canal_arr, dr, catchment_mask)
+        # Plot raster arrays after the computation
         big_4_raster_plot(title='After the computation',
-            raster1=((hydro_utils.peat_map_h_to_tra(soil_type_mask=peat_type_mask, gwt=(phi.value - ele), h_to_tra_and_C_dict=httd) - tra_to_cut)*cmask.value *drmask_not.value ).reshape(ny,nx),
-            raster2=(ele.reshape(ny,nx) - wt_canal_arr) * dr * catchment_mask,
-            raster3=ele.reshape(ny,nx),
-            raster4=(ele-phi.value).reshape(ny,nx)
+            raster1= rast_D_after,
+            raster2= rast_cwl_after,
+            raster3= rast_dem_after,
+            raster4= rast_elev_phi_after
             )
+            
+        plt.show()
         
         fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(12,9), dpi=80)
         x = np.arange(-21,1,0.1)
@@ -340,4 +374,4 @@ def hydrology(solve_mode, nx, ny, dx, dy, days, ele, phi_initial, catchment_mask
         
     avg_wt_over_time = np.mean(np.array(avg_wt))        
     
-    return dry_peat_volume, wt_track_drained, wt_track_notdrained, avg_wt_over_time
+    return dry_peat_volume, wt_track_drained, wt_track_notdrained, np.mean(np.array(avg_wt)), (rast_D_before, rast_cwl_before, rast_dem_before, rast_elev_phi_before), (rast_D_after, rast_cwl_after, rast_dem_after, rast_elev_phi_after)
