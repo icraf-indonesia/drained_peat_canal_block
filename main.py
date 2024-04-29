@@ -11,7 +11,6 @@ conda_env_path = sys.prefix
 os.environ['GDAL_DATA'] = conda_env_path + '/Library/share/gdal'
 
 import argparse
-import openpyxl
 import pickle
 import numpy as np
 import matplotlib.pyplot as plt
@@ -63,7 +62,7 @@ _ , dem, peat_type_arr, peat_depth_arr = preprocess_data.read_preprocess_rasters
 # Read parameters
 PARAMS_df = preprocess_data.read_params(params_fn)
 BLOCK_HEIGHT = PARAMS_df.block_height[0]; CANAL_WATER_LEVEL = PARAMS_df.canal_water_level[0]
-DIRI_BC = PARAMS_df.diri_bc[0]; HINI = PARAMS_df.hini[0];
+DIRI_BC = PARAMS_df.diri_bc[0]; HINI = PARAMS_df.hini[0]
 ET = PARAMS_df.ET[0]; TIMESTEP = PARAMS_df.timeStep[0]; KADJUST = PARAMS_df.Kadjust[0]
 
 # Read precipitation
@@ -157,10 +156,11 @@ for i in range(0,N_ITER):
         wt_canal_arr[coords] = wt_canals[canaln] 
     
     
-    dry_peat_volume, wt_track_drained, wt_track_notdrained, avg_wt_over_time = hydro.hydrology('transient', nx, ny, dx, dy, DAYS, ele, phi_ini, catchment_mask, wt_canal_arr, boundary_arr,
-                                                      peat_type_mask=peat_type_masked, httd=h_to_tra_and_C_dict, tra_to_cut=tra_to_cut, sto_to_cut=sto_to_cut,
-                                                      diri_bc=DIRI_BC, neumann_bc = None, plotOpt=True, remove_ponding_water=True,
-                                                      P=P, ET=ET, dt=TIMESTEP)
+    dry_peat_volume, wt_track_drained, wt_track_notdrained, avg_wt_over_time, (rast_D_before, rast_cwl_before, rast_dem_before, rast_elev_phi_before), (rast_D_after, rast_cwl_after, rast_dem_after, rast_elev_phi_after) = hydro.hydrology(
+          'transient', nx, ny, dx, dy, DAYS, ele, phi_ini, catchment_mask, wt_canal_arr, boundary_arr,
+          peat_type_mask=peat_type_masked, httd=h_to_tra_and_C_dict, tra_to_cut=tra_to_cut, sto_to_cut=sto_to_cut,
+          diri_bc=DIRI_BC, neumann_bc=None, plotOpt=True, remove_ponding_water=True,
+          P=P, ET=ET, dt=TIMESTEP)
     
     water_blocked_canals = sum(np.subtract(wt_canals[1:], oWTcanlist[1:]))
     
