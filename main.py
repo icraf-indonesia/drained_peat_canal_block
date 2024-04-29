@@ -38,7 +38,7 @@ N_ITER = args.niter
 cum_Vdp_nodams = 21088.453521509597 # Value of dry peat volume without any blocks, without any precipitation for 3 days. Normalization.
 track_WT_drained_area = (239,166) # datasetv1_AP 
 track_WT_notdrained_area = (522,190) # datasetv1_AP 
-hand_made_dams = True # compute performance of cherry-picked locations for dams.
+hand_made_dams = False # compute performance of cherry-picked locations for dams.
 
 """
 Read and preprocess data
@@ -172,17 +172,19 @@ for i in range(0,N_ITER):
     Final printings
     """
     fname = r'output/results_mc_3_cumulative.txt'
-    if N_ITER > 20:  # only if big enough number of simulated days
+    if N_ITER > 0:  # only if big enough number of simulated days
         with open(fname, 'a') as output_file:
             output_file.write(
                                 "\n" + str(i) + "    " + str(dry_peat_volume) + "    "
                                 + str(N_BLOCKS) + "    " + str(N_ITER) + "    " + str(DAYS) + "    "
                                 + str(time.ctime()) + "    " + str(water_blocked_canals)
                               )
+                              
 """
 Save WTD data if simulating a year
 """
 fname = r'output/wtd_year_' + str(N_BLOCKS) + '.txt'
+
 if DAYS > 300:
    with open(fname, 'a') as output_file:
        output_file.write("\n %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n" +

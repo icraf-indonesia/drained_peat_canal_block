@@ -340,4 +340,4 @@ def hydrology(solve_mode, nx, ny, dx, dy, days, ele, phi_initial, catchment_mask
         
     avg_wt_over_time = np.mean(np.array(avg_wt))        
     
-    return avg_wt_over_time
+    return dry_peat_volume, wt_track_drained, wt_track_notdrained, avg_wt_over_time
