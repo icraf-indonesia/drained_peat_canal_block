@@ -1,6 +1,6 @@
 # Drained Peat Canal Block Simulator
 
-Drained Peat Canal Block Simulator is an open-source model that developed based on research by [Urzainki et al (2020)](https://doi.org/10.5194/bg-17-4769-2020). This model simulates water table depth in peatland areas with canal networks to assess the impact of canal blocking on restoration efforts. The simulation results show how blocking canals reduces carbon emissions from peat decomposition.
+Drained Peat Canal Block Simulator is an open-source model that developed based on research by [Urzainki et al (2020)](https://doi.org/10.5194/bg-17-4769-2020). This model simulates ground water table depth in peatland areas with canal networks to assess the impact of canal blocking on restoration efforts. The simulation results show how blocking canals reduces carbon emissions from peat decomposition.
 
 ## Getting Started
 
@@ -48,25 +48,10 @@ If an error message occurs, please investigate and refer to the *common error* s
 
 The script needs the following data to run:
 
-No | Data | Type | Format | Parameter
---- | --- | --- | --- | ---
-1 | Elevation map | Raster | .tif | `dem_rst_fn`
-2 | Peat canal network map | Raster | .tif | `can_rst_fn`
-3 | Peat depth and soil type map | Raster | .tif | `peat_depth_rst_fn`
-4 | Daily precipitation of selected period of time | Tabular | .xlsx | `rainfall_fn`
-5 | Information about canal block height, initial canal water level, etc | Tabular | .xlsx | `params_fn`
-
-Beside all data required, there are some parameters that need to defined to run the model. Consist of duration of simulation (in DAYS), total number of canal block simulates and total times of simulation iteration.
-
-### Data Preparation
-
-There are certain guidelines you need to follow to prepare data for simulation.
-
-1. All raster data should share the same extent, cell size, and column-row number. This is essential for consistent data processing in the model, requiring uniform properties across datasets.
-
-2. Ensure preparation for tabular data aligns with the template references for [`rainfall_fn`](https://github.com/icraf-indonesia/drained_peat_canal_block/blob/main/data/original_data/params.xlsx) and [`params_fn`](https://github.com/icraf-indonesia/drained_peat_canal_block/blob/main/data/original_data/params.xlsx)
-
-3. 
+1.  An elevation raster such as DEM in a raster image
+2.  A canal network map as a raster image
+3.  A soil type and depth map as a raster image
+4.  Daily precipitation data for a year of selected period of time
 
 ## Reference
 
