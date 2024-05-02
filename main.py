@@ -22,8 +22,8 @@ Parse command-line arguments
 """
 parser = argparse.ArgumentParser(description='Run hydro without any optimization.')
 
-parser.add_argument('-d','--days', default=1, help='(int) Number of outermost iterations of the fipy solver, be it steadystate or transient. Default=10.', type=int)
-parser.add_argument('-b','--nblocks', default=0, help='(int) Number of blocks to locate. Default=5.', type=int)
+parser.add_argument('-d','--days', default=3, help='(int) Number of outermost iterations of the fipy solver, be it steadystate or transient. Default=10.', type=int)
+parser.add_argument('-b','--nblocks', default=80, help='(int) Number of blocks to locate. Default=5.', type=int)
 parser.add_argument('-n','--niter', default=1, help='(int) Number of repetitions of the whole computation. Default=10', type=int)
 args = parser.parse_args()
 
@@ -41,14 +41,14 @@ Read and preprocess data
 """
 
 # # preprocessed_datafolder = r"/data/dataset_v1"
-dem_rst_fn = r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/drained_peat_canal_block/data/sugihan-lumpur_data/dsm_alos_3d_oki.tif" #r"data/dataset_v1/11Dataset_v1new/DatasetV1-new/srtm_clipped_DI_res.tif" #preprocessed_datafolder + r"/02Elevasi/Demnas_KHG_SL.tif" 
-can_rst_fn = r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/drained_peat_canal_block/data/sugihan-lumpur_data/canal_new_res.tif"  #preprocessed_datafolder + r"/03CanalNetwork/Canal_rcl_F.tif"
-peat_depth_rst_fn = r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/drained_peat_canal_block/data/sugihan-lumpur_data/peattype_new_res.tif" #preprocessed_datafolder + r"/04Peat/Peat depth.tif" # peat depth, peat type in the same raster
+dem_rst_fn = r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/drained_peat_canal_block/data/sugihan-lumpur_data/dsm_alos_3d_oki.tif" #"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/drained_peat_canal_block/data/original_data/DTM_metres_clip.tif"  r"data/dataset_v1/11Dataset_v1new/DatasetV1-new/srtm_clipped_DI_res.tif" #preprocessed_datafolder + r"/02Elevasi/Demnas_KHG_SL.tif" 
+can_rst_fn = r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/drained_peat_canal_block/data/sugihan-lumpur_data/canal_new_res.tif"  #"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/drained_peat_canal_block/data/original_data/canals_clip.tif" preprocessed_datafolder + r"/03CanalNetwork/Canal_rcl_F.tif"
+peat_depth_rst_fn = r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/drained_peat_canal_block/data/sugihan-lumpur_data/peattype_new_res.tif" #"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/drained_peat_canal_block/data/original_data/Peattypedepth_clip.tif" preprocessed_datafolder + r"/04Peat/Peat depth.tif" # peat depth, peat type in the same raster
 
 # <<<<<<< HEAD
 # # abs_path_data = os.path.abspath('/data') # Absolute path to data folder needed for Excel file with parameters
 params_fn = r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/drained_peat_canal_block/data/sugihan-lumpur_data/params.xlsx" #abs_path_data + r"/params.xlsx"
-rainfall_fn = r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/drained_peat_canal_block/data/sugihan-lumpur_data/2023_rainfall_plm.xlsx" #r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/peat_canal_block/python3/data/dataset_v1/06Rainfall/2023_rainfall_plm.xlsx"
+rainfall_fn = r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/drained_peat_canal_block/data/sugihan-lumpur_data/2023_rainfall_plm.xlsx" #"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/drained_peat_canal_block/data/original_data/2012_rainfall.xlsx"  r"D:/OneDrive - CIFOR-ICRAF/Documents/GitHub/peat_canal_block/python3/data/dataset_v1/06Rainfall/2023_rainfall_plm.xlsx"
 
 # =======
 # abs_path_data = os.path.join(os.getcwd(), "data") # Absolute path to data folder needed for Excel file with parameters

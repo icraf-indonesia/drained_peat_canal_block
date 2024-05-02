@@ -94,11 +94,11 @@ def hydrology(solve_mode, nx, ny, dx, dy, days, ele, phi_initial, catchment_mask
 #    dneg = []
    
     # define location of points whose WTD to track in the dem
-    # track_WT_drained_area = (239,166) # blopti dataset
-    # track_WT_notdrained_area = (522,190) # blopti dataset
+    track_WT_drained_area = (239,166) # blopti dataset
+    track_WT_notdrained_area = (522,190) # blopti dataset
     
-    track_WT_drained_area = (314,488) # datasetv1_AP 
-    track_WT_notdrained_area = (243,651) # datasetv1_AP 
+    # track_WT_drained_area = (314,488) # datasetv1_AP 
+    # track_WT_notdrained_area = (243,651) # datasetv1_AP 
     
     ele[~catchment_mask] = 0.
     ele = ele.flatten()
@@ -181,7 +181,7 @@ def hydrology(solve_mode, nx, ny, dx, dy, days, ele, phi_initial, catchment_mask
                 raster4=(ele-phi.value).reshape(ny,nx)
                 )
         # for later cross-section plots
-        y_value=500
+        y_value=180
 
         
 #        print "first cross-section plot"

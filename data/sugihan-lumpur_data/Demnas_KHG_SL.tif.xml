@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xml:lang="en"><Esri><CreaDate>20240201</CreaDate><CreaTime>13321000</CreaTime><ArcGISFormat>1.0</ArcGISFormat><SyncOnce>TRUE</SyncOnce><DataProperties><lineage><Process ToolSource="c:\program files (x86)\arcgis\desktop10.5\ArcToolbox\Toolboxes\Spatial Analyst Tools.tbx\ExtractByMask" Date="20240201" Time="133210">ExtractByMask DEMNAS_Sumsel_48s.tif "1Basemap\Base KHG F.tif" "F:\1_Project\29_Peat-Impact\3_Analysis\18_Canal blocking\Data\02Elevasi\Demnas KHG SL.tif"</Process></lineage></DataProperties></Esri></metadata>
