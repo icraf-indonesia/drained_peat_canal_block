@@ -356,8 +356,8 @@ display: none;
 <h1>Drained Peat Canal Block Simulator</h1>
 <p>Drained Peat Canal Block Simulator is an open-source model that
 developed based on research by <a href="https://doi.org/10.5194/bg-17-4769-2020">Urzainki et al
-(2020)</a>. This model simulates ground water table depth in peatland
-areas with canal networks to assess the impact of canal blocking on
+(2020)</a>. This model simulates water table depth in peatland areas
+with canal networks to assess the impact of canal blocking on
 restoration efforts. The simulation results show how blocking canals
 reduces carbon emissions from peat decomposition.</p>
 <div id="getting-started" class="section level2">
@@ -415,12 +415,80 @@ persists, attempt to debug the script.</p>
 <div id="data" class="section level2">
 <h2>Data</h2>
 <p>The script needs the following data to run:</p>
+<table>
+<colgroup>
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>No</th>
+<th>Data</th>
+<th>Type</th>
+<th>Format</th>
+<th>Parameter</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Elevation map</td>
+<td>Raster</td>
+<td>.tif</td>
+<td><code>dem_rst_fn</code></td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Peat canal network map</td>
+<td>Raster</td>
+<td>.tif</td>
+<td><code>can_rst_fn</code></td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Peat depth and soil type map</td>
+<td>Raster</td>
+<td>.tif</td>
+<td><code>peat_depth_rst_fn</code></td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Daily precipitation of selected period of time</td>
+<td>Tabular</td>
+<td>.xlsx</td>
+<td><code>rainfall_fn</code></td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Information about canal block height, initial canal water level,
+etc</td>
+<td>Tabular</td>
+<td>.xlsx</td>
+<td><code>params_fn</code></td>
+</tr>
+</tbody>
+</table>
+<p>Beside all data required, there are some parameters that need to
+defined to run the model. Consist of duration of simulation (in DAYS),
+total number of canal block simulates and total times of simulation
+iteration.</p>
+<div id="data-preparation" class="section level3">
+<h3>Data Preparation</h3>
+<p>There are certain guidelines you need to follow to prepare data for
+simulation.</p>
 <ol style="list-style-type: decimal">
-<li>An elevation raster such as DEM in a raster image</li>
-<li>A canal network map as a raster image</li>
-<li>A soil type and depth map as a raster image</li>
-<li>Daily precipitation data for a year of selected period of time</li>
+<li><p>All raster data should share the same extent, cell size, and
+column-row number. This is essential for consistent data processing in
+the model, requiring uniform properties across datasets.</p></li>
+<li><p>Ensure preparation for tabular data aligns with the template
+references for <a href="https://github.com/icraf-indonesia/drained_peat_canal_block/blob/main/data/original_data/params.xlsx"><code>rainfall_fn</code></a>
+and <a href="https://github.com/icraf-indonesia/drained_peat_canal_block/blob/main/data/original_data/params.xlsx"><code>params_fn</code></a></p></li>
+<li></li>
 </ol>
+</div>
 </div>
 <div id="reference" class="section level2">
 <h2>Reference</h2>
