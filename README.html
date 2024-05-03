@@ -472,9 +472,10 @@ etc</td>
 </tbody>
 </table>
 <p>In addition to all the required data, there are several parameters
-that need to be defined to run the model. These include the duration of
-the simulation (in days), the total number of simulated canal blocks,
-and the total number of simulation iterations.</p>
+that need to be defined to run the model. These include
+<code>DAYS</code>: the duration of the simulation (in days),
+<code>NBLOCKS</code>: the total number of simulated canal blocks, and
+<code>N_ITER</code>: the total number of simulation iterations.</p>
 <div id="data-preparation" class="section level3">
 <h3>Data Preparation</h3>
 <p>There are certain guidelines you need to follow to prepare data for
@@ -488,6 +489,27 @@ references for <a href="https://github.com/icraf-indonesia/drained_peat_canal_bl
 and <a href="https://github.com/icraf-indonesia/drained_peat_canal_block/blob/main/data/original_data/params.xlsx"><code>params_fn</code></a></p></li>
 </ol>
 </div>
+</div>
+<div id="how-to-simulate-canal-blocking" class="section level2">
+<h2>How to simulate canal blocking?</h2>
+<p>This model can simulate peat water table depth with or without canal
+blocking. The parameter directly controlling the activation and
+deactivation of canal blocking is <code>hand_made_dams</code> in
+<code>main.py</code>.</p>
+<ol style="list-style-type: decimal">
+<li><p>Setting <code>hand_made_dams</code> to <code>True</code> enables
+simulations with canal blocking at specified locations defined by the
+user beforehand.</p></li>
+<li><p>Setting <code>hand_made_dams</code> to <code>False</code>
+disables simulations with canal blocking at user-defined specified
+locations, resulting in two available options.:</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>If <code>N_BLOCK &gt; 0</code>, canal block locations will be
+generated randomly.</p></li>
+<li><p>if <code>N_BLOCK = 0</code>, simulations will run without any
+canal block installed.</p></li>
+</ol></li>
+</ol>
 </div>
 <div id="reference" class="section level2">
 <h2>Reference</h2>
