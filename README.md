@@ -48,13 +48,13 @@ If an error message occurs, please investigate and refer to the *common error* s
 
 The script needs the following data to run:
 
-No | Data | Type | Format | Parameter
---- | --- | --- | --- | ---
-1 | Elevation map | Raster | .tif | `dem_rst_fn`
-2 | Peat canal network map | Raster | .tif | `can_rst_fn`
-3 | Peat depth and soil type map | Raster | .tif | `peat_depth_rst_fn`
-4 | Daily precipitation of selected period of time | Tabular | .xlsx | `rainfall_fn`
-5 | Information about canal block height, initial canal water level, etc | Tabular | .xlsx | `params_fn`
+| No  | Data                                                                 | Type    | Format | Parameter           |
+|---------------|---------------|---------------|---------------|---------------|
+| 1   | Elevation map                                                        | Raster  | .tif   | `dem_rst_fn`        |
+| 2   | Peat canal network map                                               | Raster  | .tif   | `can_rst_fn`        |
+| 3   | Peat depth and soil type map                                         | Raster  | .tif   | `peat_depth_rst_fn` |
+| 4   | Daily precipitation of selected period of time                       | Tabular | .xlsx  | `rainfall_fn`       |
+| 5   | Information about canal block height, initial canal water level, etc | Tabular | .xlsx  | `params_fn`         |
 
 In addition to all the required data, there are several parameters that need to be defined to run the model. These include `DAYS`: the duration of the simulation (in days), `NBLOCKS`: the total number of simulated canal blocks, and `N_ITER`: the total number of simulation iterations.
 
@@ -62,21 +62,24 @@ In addition to all the required data, there are several parameters that need to 
 
 There are certain guidelines you need to follow to prepare data for simulation.
 
-1. All raster data should share the same extent, cell size, and column-row number. This is essential for consistent data processing in the model, requiring uniform properties across datasets.
+1.  All raster data should share the same extent, cell size, and column-row number. This is essential for consistent data processing in the model, requiring uniform properties across datasets.
 
-2. Ensure preparation for tabular data aligns with the template references for [`rainfall_fn`](https://github.com/icraf-indonesia/drained_peat_canal_block/blob/main/data/original_data/params.xlsx) and [`params_fn`](https://github.com/icraf-indonesia/drained_peat_canal_block/blob/main/data/original_data/params.xlsx)
+2.  Ensure preparation for tabular data aligns with the template references for [`rainfall_fn`](https://github.com/icraf-indonesia/drained_peat_canal_block/blob/main/data/original_data/params.xlsx) and [`params_fn`](https://github.com/icraf-indonesia/drained_peat_canal_block/blob/main/data/original_data/params.xlsx)
 
 ## How to simulate canal blocking?
 
 This model can simulate peat water table depth with or without canal blocking. The parameter directly controlling the activation and deactivation of canal blocking is `hand_made_dams` in `main.py`.
 
-1. Setting `hand_made_dams` to `True` enables simulations with canal blocking at specified locations defined by the user beforehand.
+1.  Setting `hand_made_dams` to `True` enables simulations with canal blocking at specified locations defined by the user beforehand.
 
-2. Setting `hand_made_dams` to `False` disables simulations with canal blocking at user-defined specified locations, resulting in two available options.:
+2.  Setting `hand_made_dams` to `False` disables simulations with canal blocking at user-defined specified locations, resulting in two available options.:
 
-    a. If `N_BLOCK > 0`, canal block locations will be generated randomly.
+    a.  If `N_BLOCK > 0`, canal block locations will be generated randomly.
 
-    b. if `N_BLOCK = 0`, simulations will run without any canal block installed.
+    b.  if `N_BLOCK = 0`, simulations will run without any canal block installed.
+
+![](images/canal block picked illustration.png)
+
 
 ## Reference
 
