@@ -49,7 +49,7 @@ If an error message occurs, please investigate and refer to the *common error* s
 The script needs the following data to run:
 
 | No  | Data                                                                 | Type    | Format | Parameter           |
-|---------------|---------------|---------------|---------------|---------------|
+|-----|----------------------------------------------------------------------|---------|--------|---------------------|
 | 1   | Elevation map                                                        | Raster  | .tif   | `dem_rst_fn`        |
 | 2   | Peat canal network map                                               | Raster  | .tif   | `can_rst_fn`        |
 | 3   | Peat depth and soil type map                                         | Raster  | .tif   | `peat_depth_rst_fn` |
@@ -78,8 +78,9 @@ This model can simulate peat water table depth with or without canal blocking. T
 
     b.  if `N_BLOCK = 0`, simulations will run without any canal block installed.
 
-![](images/canal block picked illustration.png)
+When the `hand_made_dams` parameter is set to `True`, the process to select the canal block is illustrated by the following image. First, the canal network raster, which contains cell values of 1 for canal and 0 for non-canal, is reclassified. All cells with a value of 1 are then reclassified to unique numbers in ascending order. The number value of each canal cell in the reclassified raster is then used to pick the location of the canal block. Finally, the selected number is inputted into the model for the parameter `hand_picked_dams`.
 
+![fig. canal blocking location selection ilustration](images/canal%20block%20picked%20illustration.png)
 
 ## Reference
 
