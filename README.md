@@ -38,33 +38,51 @@ conda create -c conda-forge -n spyder-env spyder numpy scipy pandas matplotlib s
 
 ### Check when the model is properly installed
 
-To check the installation, launch the IDE (e.g., Spyder) and attempt to run the *main.py* file as provided. The correct installation will resulted the plot below:
+To check the installation, launch the IDE (e.g., Spyder) and attempt to run the *main.py* file as provided. The correct installation will resulted the plot below.
 
-![Plot result from model](src/images/plot-after-computation.png)
+![fig. plot result from model](src/images/plot-after-computation.png){width="612"}
 
-If an error message occurs, please investigate and refer to the *common error* solution [WILL PREPARED SOON]. If the error persists, attempt to debug the script.
+------------------------------------------------------------------------
 
-## Data
+The model output includes four main maps: DEM, canal water level, D, and elevation-phi. The DEM shows the height of the peat surface and helps understand water flow and how canal blocks affect water levels. The canal water level (CWL) measures water in the canal network, starting out even but changing after blocks are added, which then affects water table depth (WTD) in the model. D indicates transmissivity, a parameter to see how easily water moves through the peat, based on the slope between the water table depth and the peat surface. Elevation-phi's plot shows the difference between land height and water table depth, with positive values indicating areas where dry peat can form.
 
-The script needs the following data to run:
+If the plot result doesn't show up or an error message occurs, please investigate and refer to the [common error solutions](). If the error persists, attempt to debug the script.
 
-| No  | Data                                                                 | Type    | Format | Parameter           |
-|-----|----------------------------------------------------------------------|---------|--------|---------------------|
-| 1   | Elevation map                                                        | Raster  | .tif   | `dem_rst_fn`        |
-| 2   | Peat canal network map                                               | Raster  | .tif   | `can_rst_fn`        |
-| 3   | Peat depth and soil type map                                         | Raster  | .tif   | `peat_depth_rst_fn` |
-| 4   | Daily precipitation of selected period of time                       | Tabular | .xlsx  | `rainfall_fn`       |
-| 5   | Information about canal block height, initial canal water level, etc | Tabular | .xlsx  | `params_fn`         |
+## Data & Parameters
 
-In addition to all the required data, there are several parameters that need to be defined to run the model. These include `DAYS`: the duration of the simulation (in days), `NBLOCKS`: the total number of simulated canal blocks, and `N_ITER`: the total number of simulation iterations.
+The script needs the following data to run.
 
-### Data Preparation
+| No  | Data                                  | Type    | Format  | Parameter           | Description                                                                                                                                                                                                                                                                                                                                                   | Unit                                     |
+|-----|-----------|--------|--------|-----------|--------------------------|-----------|
+| 1   | Elevation map                         | Raster  | GeoTIFF | `dem_rst_fn`        | elevation data for the entire study area                                                                                                                                                                                                                                                                                                                      | meters (*m*)                             |
+| 2   | Peat canal network map                | Raster  | GeoTIFF | `can_rst_fn`        | indicates the location of canals within the study area                                                                                                                                                                                                                                                                                                        | integer (*1:canal present & 0:no canal*) |
+| 3   | Peat depth and soil type map          | Raster  | GeoTIFF | `peat_depth_rst_fn` | information about the depth of the peat layer at each location                                                                                                                                                                                                                                                                                                | meters (*m*)                             |
+| 4   | Daily precipitation                   | Tabular | .xlsx   | `rainfall_fn`       | excel file containing daily precipitation data for the simulation period                                                                                                                                                                                                                                                                                      | milimeters per day (*mm/day*)            |
+| 5   | Information about specific parameters | YAML    | .yml    | `params_fn`         | The specific parameters: block_height (*m*), canal_water_level (m), diri_bc (the dirichlet boundary condition value, *m*), hini (the initial hydraulic head, *m*), P (average precipitation rate, *mm/day*), ET (evapotranspiration rate, *mm/day*), timeStep (time step for the transient simulation, in days), & Kadjust (hydraulic conductivity, unitless) | multi-unit                               |
+
+In addition to the required data, several parameters must be defined to run the model. These parameters need to be set in the main.py file before running the model. The parameters should be adjusted according to the simulation scenario that the user wants to run. The following table lists these parameters.
+
+| No  | Parameter Name                                         | Description                                                                                                                                                                                                                 | Format                              | Unit                                |
+|------|-----------|-------------------------------|------------|---------------|
+| 1   | `DAYS`                                                 | Number of days to simulate the model                                                                                                                                                                                        | Integer                             | days                                |
+| 2   | `N_BLOCKS`                                             | Number of canal blocks to be placed in the peatland                                                                                                                                                                         | Integer                             | number of blocks                    |
+| 3   | `N_ITER`                                               | Number of iterations for the Monte Carlo simulation or optimization algorithm, influencing the search for optimal dam placements. In the case of Monte Carlo, this specifies how many random dam configurations to evaluate | Integer                             | number of iterations or generations |
+| 4   | `track_WT_drained_area` and `track_WT_notdrained_area` | Coordinates (row and column) of specific pixels within the DEM, allowing you to monitor the water table depth at specific locations and analyze the spatial variability of rewetting                                        | Tuple of two integers (row, column) | pixel coordinates                   |
+| 5   | `hand_made_dams`                                       | A Boolean flag indicating whether to use hand-picked dam locations for evaluation instead of using the optimization algorithms or random placement.                                                                         | Boolean                             | `True` or `False`                   |
+
+### Data & Parameters Preparation
 
 There are certain guidelines you need to follow to prepare data for simulation.
 
-1.  All raster data should share the same extent, cell size, and column-row number. This is essential for consistent data processing in the model, requiring uniform properties across datasets.
+1.  Define the area of interest (AOI) by providing a base map that will be used as a reference for all raster data. This ensures that all raster data will share the same extent, cell size, and number of columns and rows after being clipped by the base map. This consistency is essential for uniform data processing in the model.
 
-2.  Ensure preparation for tabular data aligns with the template references for [`rainfall_fn`](https://github.com/icraf-indonesia/drained_peat_canal_block/blob/main/data/original_data/params.xlsx) and [`params_fn`](https://github.com/icraf-indonesia/drained_peat_canal_block/blob/main/data/original_data/params.xlsx)
+2.  For optimal model results, use **locally available data** or other locally relevant data, especially for the peat type and canal network data raster. If local data is limited, alternative sources can be used. For elevation data, consider sources like SRTM, DEMNAS, etc. For soil type data, consider sources like USDA, etc.
+
+3.  To prepare the precipitation data, use data from a nearby weather station in the study site. If no local data is available, use [Ogimet](https://www.ogimet.com/home.phtml.en), following the provided [Ogimet tutorial](https://www.ogimet.com/gsynres.phtml.en). Ensure preparation for precipitation tabular data aligns with the template references for [`rainfall_fn`](https://github.com/icraf-indonesia/drained_peat_canal_block/blob/main/data/original_data/params.xlsx)
+
+4.  The list of parameters in the [YAML file]() below should be filled according to the user's desired scenario. This parameterization process will be relevant if consulted with an expert. If expert consultation is not possible, please refer to the original publication for guidance.
+
+    ![fig. yaml file structure](images/yaml.png)
 
 ## How to simulate canal blocking?
 
