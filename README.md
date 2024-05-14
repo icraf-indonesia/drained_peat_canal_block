@@ -24,7 +24,7 @@ Before the model can be used, there are installation steps that you need to foll
 conda create -n [name of environment] python=3 fipy rasterio pandas xlrd
 ```
 
-3.  Activate the new environment created
+4.  Activate the new environment created
 
 ```         
 conda activate [name of environment]
@@ -38,22 +38,33 @@ conda create -c conda-forge -n spyder-env spyder numpy scipy pandas matplotlib s
 
 ### Check when the model is properly installed
 
-To check the installation, launch the IDE (e.g., Spyder) and attempt to run the *main.py* file as provided. The correct installation will resulted the plot below.
+To check the installation, here is a step-by-step guide. The following steps are for Spyder IDE, but you can use another IDE (Visual Studio Code, PyCharm, etc.).
 
+1.  Launch the IDE first, either from the application icon or via Anaconda Prompt.
+
+```         
+Spyder
+```
+
+2.  After Spyder opens, (1) open the main.py file, (2) ensure the main.py tab is selected, and (3) run the model and wait for the output.
+
+    ![](src/images/spyder.png)
+
+3. The correct installation will resulted the plot below.
 ![fig. plot result from model](src/images/plot-after-computation.png){width="612"}
 
 ------------------------------------------------------------------------
 
-The model output includes four main maps: DEM, canal water level, D, and elevation-phi. The DEM shows the height of the peat surface and helps understand water flow and how canal blocks affect water levels. The canal water level (CWL) measures water in the canal network, starting out even but changing after blocks are added, which then affects water table depth (WTD) in the model. D indicates transmissivity, a parameter to see how easily water moves through the peat, based on the slope between the water table depth and the peat surface. Elevation-phi's plot shows the difference between land height and water table depth, with positive values indicating areas where dry peat can form.
+4. The model output includes four main maps: DEM, canal water level, D, and elevation-phi. The DEM shows the height of the peat surface and helps understand water flow and how canal blocks affect water levels. The canal water level (CWL) measures water in the canal network, starting out even but changing after blocks are added, which then affects water table depth (WTD) in the model. D indicates transmissivity, a parameter to see how easily water moves through the peat, based on the slope between the water table depth and the peat surface. Elevation-phi's plot shows the difference between land height and water table depth, with positive values indicating areas where dry peat can form.
 
-If the plot result doesn't show up or an error message occurs, please investigate and refer to the [common error solutions](). If the error persists, attempt to debug the script.
+5. If the plot result doesn't show up or an error message occurs, please investigate and refer to the [common error solutions](https://github.com/icraf-indonesia/drained_peat_canal_block/blob/write-readme/src/common-error.md). If the error persists, attempt to debug the script.
 
 ## Data & Parameters
 
 The script needs the following data to run.
 
 | No  | Data                                  | Type    | Format  | Parameter           | Description                                                                                                                                                                                                                                                                                                                                                   | Unit                                     |
-|-----|-----------|--------|--------|-----------|--------------------------|-----------|
+|------|------|------|------|------|------------------------------------|------|
 | 1   | Elevation map                         | Raster  | GeoTIFF | `dem_rst_fn`        | elevation data for the entire study area                                                                                                                                                                                                                                                                                                                      | meters (*m*)                             |
 | 2   | Peat canal network map                | Raster  | GeoTIFF | `can_rst_fn`        | indicates the location of canals within the study area                                                                                                                                                                                                                                                                                                        | integer (*1:canal present & 0:no canal*) |
 | 3   | Peat depth and soil type map          | Raster  | GeoTIFF | `peat_depth_rst_fn` | information about the depth of the peat layer at each location                                                                                                                                                                                                                                                                                                | meters (*m*)                             |
@@ -63,7 +74,7 @@ The script needs the following data to run.
 In addition to the required data, several parameters must be defined to run the model. These parameters need to be set in the main.py file before running the model. The parameters should be adjusted according to the simulation scenario that the user wants to run. The following table lists these parameters.
 
 | No  | Parameter Name                                         | Description                                                                                                                                                                                                                 | Format                              | Unit                                |
-|------|-----------|-------------------------------|------------|---------------|
+|----------|----------|---------------------------------|----------|----------|
 | 1   | `DAYS`                                                 | Number of days to simulate the model                                                                                                                                                                                        | Integer                             | days                                |
 | 2   | `N_BLOCKS`                                             | Number of canal blocks to be placed in the peatland                                                                                                                                                                         | Integer                             | number of blocks                    |
 | 3   | `N_ITER`                                               | Number of iterations for the Monte Carlo simulation or optimization algorithm, influencing the search for optimal dam placements. In the case of Monte Carlo, this specifies how many random dam configurations to evaluate | Integer                             | number of iterations or generations |
