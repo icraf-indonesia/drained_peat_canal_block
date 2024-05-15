@@ -18,7 +18,7 @@ Before using the model, you need to follow these installation steps. Here is a s
 
 ### Step 1: Get the Model Codebase
 
-First, you need to have the codebase on your local computer by downloading the code files or cloning the repository, as described in this [guideline step](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository). Make sure to locate the codebase in your desired location.
+First, you need to have the codebase on your local computer by downloading the code files or forking the repository, as described in this [guideline step](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo). Make sure to locate the codebase in your desired location.
 
 ### Step 2: Install Miniconda
 
