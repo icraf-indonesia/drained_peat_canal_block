@@ -16,113 +16,124 @@ We have modified the script to make it more accessible and easier to use than th
 
 Before using the model, you need to follow these installation steps. Here is a step-by-step guide:
 
-### Step 1: Install Miniconda
+### Step 1: Get the Model Codebase
+
+First, you need to have the codebase on your local computer by downloading the code files or cloning the repository, as described in this [guideline step](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository). Make sure to locate the codebase in your desired location.
+
+### Step 2: Install Miniconda
 
 Download and install [Miniconda](https://docs.conda.io/en/latest/miniconda.html) for your operating system. You can follow the installation instructions provided [here](https://github.com/SmithsonianWorkshops/CodingInPython/blob/master/Week%200/Installing%20miniconda%20on%20Windows.md).
 
-### Step 2: Open Anaconda Prompt
+### Step 3: Open Anaconda Prompt
 
 After installing Miniconda, open the Anaconda Prompt from your Start Menu.
 
-### Step 3: Create a New Conda Environment
+### Step 4: Create a New Conda Environment
 
 Use the following command to create the conda environment from the `canal-block_environment.yml` file. Make sure the `.yml` file is in your current directory or provide the full path to the file.
 
-```sh
+``` sh
 conda env create -f canal-block_environment.yml
 ```
 
-### Step 4: Activate the Conda Environment
+### Step 5: Activate the Conda Environment
 
 Once the environment is created, activate it using the following command:
 
-```sh
+``` sh
 conda activate canal-block
 ```
 
 You can verify the installation by checking the list of installed packages:
 
-```sh
+``` sh
 conda list
 ```
 
-### Step 5: Install Spyder (if not already installed) as an IDE
+### Step 6: Install Spyder (if not already installed) as an IDE
 
 To run the model, you can utilize an integrated development environment (IDE) like [Spyder](https://github.com/spyder-ide/spyder). However, feel free to pick your preferred IDE.
 
 If Spyder is not already installed, you can install it using Conda. Run the following command:
 
-```sh
+``` sh
 conda install spyder
 ```
 
 You can open Spyder directly from the Anaconda Navigator or from the Command Prompt/Anaconda Prompt by typing:
 
-```sh
+``` sh
 spyder
 ```
 
-### Step 6: Configure Spyder to Use the `canal-block` Environment
+### Step 7: Configure Spyder to Use the `canal-block` Environment
 
-1. **Open Preferences**: In Spyder, go to `Tools` > `Preferences`.
-2. **Python Interpreter**:
-    - In the Preferences window, navigate to `Python interpreter` under the `Preferences` section on the left.
-    - Select the option `Use the following Python interpreter`.
-    - Browse to the Python interpreter in the `canal-block` environment. To find the path to the Python interpreter, you can use the following command in the Anaconda Prompt while the `canal-block` environment is activated:
-    
-    ```sh
+1.  **Open Preferences**: In Spyder, go to `Tools` \> `Preferences`.
+
+2.  **Python Interpreter**:
+
+    -   In the Preferences window, navigate to `Python interpreter` under the `Preferences` section on the left.
+    -   Select the option `Use the following Python interpreter`.
+    -   Browse to the Python interpreter in the `canal-block` environment. To find the path to the Python interpreter, you can use the following command in the Anaconda Prompt while the `canal-block` environment is activated:
+
+    ``` sh
     where python
     ```
 
     This will output the path to the Python executable, which you can then use in the Spyder configuration.
-3. **Apply and Restart**:
-    - Click `Apply` and then `OK`.
-    - Restart Spyder to apply the changes.
 
-### Step 7: Verify the Environment in Spyder
+3.  **Apply and Restart**:
+
+    -   Click `Apply` and then `OK`.
+    -   Restart Spyder to apply the changes.
+
+### Step 8: Verify the Environment in Spyder
 
 To verify that Spyder is using the `canal-block` environment, you can run a simple command in the Spyder IPython console:
 
-```python
+``` python
 import sys
 print(sys.executable)
 ```
 
 This should print the path to the Python executable in the `canal-block` environment.
 
-### Step 8: Test the Peat Hydrological Model
+### Step 9: Test the Peat Hydrological Model
 
-After Spyder opens:
-1. Open the `main.py` file.
-2. Ensure the `main.py` tab is selected.
-3. Run the model and wait for the output.
+1.  To test the model, you need to open the codebase project. In Spyder, go to `Projects` \> `Open Project` and then choose the `drained_peat_canal_block` folder in the location you selected before.
 
-![Spyder Interface](src/images/spyder.png)
+2.  After the project opens, follow these steps:
 
-A successful run will produce a plot similar to the one below:
+    a.  Open the `main.py` file.
+    b.  Ensure the `main.py` tab is selected.
+    c.  Run the model and wait for the output.
 
-![Plot Result from Model](src/images/plot-after-computation.png)
+    ![*Spyder Interface*](src/images/spyder.png)
 
-The model output includes four main maps: `DEM`, canal water level (`CWL`), `D`, and `elevation-phi`. The DEM shows the height of the peat surface and helps understand water flow and how canal blocks affect water levels. The `CWL` measures water in the canal network, starting out even but changing after blocks are added, which then affects the water table depth (WTD) in the model. The parameter `D` indicates transmissivity, showing how easily water moves through the peat, based on the slope between the WTD and the peat surface. The elevation-phi plot shows the difference between land height and WTD, with positive values indicating areas where dry peat can form.
+    A successful run will produce a plot similar to the one below.
 
-If the plot results do not show up or an error message occurs, please investigate and refer to the [common error solutions](https://github.com/icraf-indonesia/drained_peat_canal_block/blob/write-readme/src/common-error.md). If the error persists, feel free to create an issue in this GitHub repository.
+    ![*Plot Result from Model*](src/images/plot-after-computation.png)
+
+    The model output includes four main maps: `DEM`, canal water level (`CWL`), `D`, and `elevation-phi`. The DEM shows the height of the peat surface and helps understand water flow and how canal blocks affect water levels. The `CWL` measures water in the canal network, starting out even but changing after blocks are added, which then affects the water table depth (WTD) in the model. The parameter `D` indicates transmissivity, showing how easily water moves through the peat, based on the slope between the WTD and the peat surface. The elevation-phi plot shows the difference between land height and WTD, with positive values indicating areas where dry peat can form.
+
+    If the plot results do not show up or an error message occurs, please investigate and refer to the [common error solutions](https://github.com/icraf-indonesia/drained_peat_canal_block/blob/write-readme/src/common-error.md). If the error persists, feel free to create an issue in this GitHub repository.
 
 ## Data & Parameters
 
 The script needs the following data to run.
 
 | No  | Data                                  | Type    | Format  | Parameter           | Description                                                                                                                                                                                                                                                                                                                                                   | Unit                                     |
-|------|------|------|------|------|------------------------------------|------|
+|--------|--------|--------|--------|--------|------------------------|--------|
 | 1   | Elevation map                         | Raster  | GeoTIFF | `dem_rst_fn`        | elevation data for the entire study area                                                                                                                                                                                                                                                                                                                      | meters (*m*)                             |
 | 2   | Peat canal network map                | Raster  | GeoTIFF | `can_rst_fn`        | indicates the location of canals within the study area                                                                                                                                                                                                                                                                                                        | integer (*1:canal present & 0:no canal*) |
 | 3   | Peat depth and soil type map          | Raster  | GeoTIFF | `peat_depth_rst_fn` | information about the depth of the peat layer at each location                                                                                                                                                                                                                                                                                                | meters (*m*)                             |
 | 4   | Daily precipitation                   | Tabular | .xlsx   | `rainfall_fn`       | excel file containing daily precipitation data for the simulation period                                                                                                                                                                                                                                                                                      | milimeters per day (*mm/day*)            |
-| 5   | Information about specific parameters | YAML    | .yml    | `params_fn`         | The specific parameters: block_height (*m*), canal_water_level (m), diri_bc (the dirichlet boundary condition value, *m*), hini (the initial hydraulic head, *m*), P (average precipitation rate, *mm/day*), ET (evapotranspiration rate, *mm/day*), timeStep (time step for the transient simulation, in days), & Kadjust (hydraulic conductivity, unitless) | -                               |
+| 5   | Information about specific parameters | YAML    | .yml    | `params_fn`         | The specific parameters: block_height (*m*), canal_water_level (m), diri_bc (the dirichlet boundary condition value, *m*), hini (the initial hydraulic head, *m*), P (average precipitation rate, *mm/day*), ET (evapotranspiration rate, *mm/day*), timeStep (time step for the transient simulation, in days), & Kadjust (hydraulic conductivity, unitless) | \-                                       |
 
 In addition to the required data, several parameters must be defined to run the model. These parameters need to be set in a YAML file before running the model. The parameters should be adjusted according to the simulation scenario that the user wants to run. The following table lists these parameters as defined in the YAML file.
 
 | No  | Parameter Name                                         | Description                                                                                                                                                                                                                 | Format                              | Unit                                |
-|----------|----------|---------------------------------|----------|----------|
+|------------|------------|-------------------------|------------|------------|
 | 1   | `DAYS`                                                 | Number of days to simulate the model                                                                                                                                                                                        | Integer                             | days                                |
 | 2   | `N_BLOCKS`                                             | Number of canal blocks to be placed in the peatland                                                                                                                                                                         | Integer                             | number of blocks                    |
 | 3   | `N_ITER`                                               | Number of iterations for the Monte Carlo simulation or optimization algorithm, influencing the search for optimal dam placements. In the case of Monte Carlo, this specifies how many random dam configurations to evaluate | Integer                             | number of iterations or generations |
@@ -133,31 +144,31 @@ In addition to the required data, several parameters must be defined to run the 
 
 There are certain guidelines you need to follow to prepare data for simulation:
 
-1. Define the area of interest (AOI) by providing a base map that will be used as a reference for all raster data. This ensures that all raster data will share the same extent, cell size, and number of columns and rows after being clipped by the base map. This consistency is essential for uniform data processing in the model.
+1.  Define the area of interest (AOI) by providing a base map that will be used as a reference for all raster data. This ensures that all raster data will share the same extent, cell size, and number of columns and rows after being clipped by the base map. This consistency is essential for uniform data processing in the model.
 
-2. For optimal model results, use **locally available data** or other locally relevant data, especially for peat type and canal network data rasters. If local data is limited, alternative sources can be used. For elevation data, consider sources like SRTM, DEMNAS, etc. For soil type data, consider sources like USDA, etc.
+2.  For optimal model results, use **locally available data** or other locally relevant data, especially for peat type and canal network data rasters. If local data is limited, alternative sources can be used. For elevation data, consider sources like SRTM, DEMNAS, etc. For soil type data, consider sources like USDA, etc.
 
-3. To prepare the precipitation data, use data from a nearby weather station in the study site. If no local data is available, use [Ogimet](https://www.ogimet.com/home.phtml.en), following the provided [Ogimet tutorial](https://www.ogimet.com/gsynres.phtml.en). Ensure the preparation of precipitation tabular data aligns with the template references for [`rainfall_fn`](https://github.com/icraf-indonesia/drained_peat_canal_block/blob/main/data/original_data/params.xlsx).
+3.  To prepare the precipitation data, use data from a nearby weather station in the study site. If no local data is available, use [Ogimet](https://www.ogimet.com/home.phtml.en), following the provided [Ogimet tutorial](https://www.ogimet.com/gsynres.phtml.en). Ensure the preparation of precipitation tabular data aligns with the template references for [`rainfall_fn`](https://github.com/icraf-indonesia/drained_peat_canal_block/blob/main/data/original_data/params.xlsx).
 
-4. The list of parameters in the YAML file below should be filled according to the user's desired scenario. This parameterization process will be more accurate if consulted with an expert. If expert consultation is not possible, please refer to the original publication for guidance.
+4.  The list of parameters in the YAML file below should be filled according to the user's desired scenario. This parameterization process will be more accurate if consulted with an expert. If expert consultation is not possible, please refer to the original publication for guidance.
 
-    ![fig. yaml file structure](images/yaml.png)
+    ![*YAML file structure*](images/yaml.png)
 
 ## How to simulate canal blocking?
 
 This model can simulate peat water table depth with or without canal blocking. The parameter directly controlling the activation and deactivation of canal blocking is `hand_made_dams` in `main.py`.
 
-1. Setting `hand_made_dams` to `True` enables simulations with canal blocking at specified locations defined by the user beforehand.
+1.  Setting `hand_made_dams` to `True` enables simulations with canal blocking at specified locations defined by the user beforehand.
 
-2. Setting `hand_made_dams` to `False` disables simulations with canal blocking at user-defined specified locations, resulting in two available options:
+2.  Setting `hand_made_dams` to `False` disables simulations with canal blocking at user-defined specified locations, resulting in two available options:
 
-    a. If `N_BLOCK > 0`, canal block locations will be generated randomly.
+    a.  If `N_BLOCK > 0`, canal block locations will be generated randomly.
 
-    b. If `N_BLOCK = 0`, simulations will run without any canal blocks installed.
+    b.  If `N_BLOCK = 0`, simulations will run without any canal blocks installed.
 
 When the `hand_made_dams` parameter is set to `True`, the process to select the canal block is illustrated by the following steps. First, the canal network raster, which contains cell values of 1 for canals and 0 for non-canals, is reclassified. All cells with a value of 1 are then reclassified to unique numbers in ascending order. The numerical value of each canal cell in the reclassified raster is then used to pick the location of the canal block. Finally, the selected number is inputted into the model for the parameter `hand_picked_dams`.
 
-![fig. canal blocking location selection ilustration](images/canal%20block%20picked%20illustration.png)
+![*Canal blocking location selection ilustration*](images/canal%20block%20picked%20illustration.png)
 
 ## Reference
 
