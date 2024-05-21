@@ -123,6 +123,9 @@ n_canals = len(c_to_r_list)
 
 owtcanlist = [x - canal_water_level for x in srfcanlist]
 
+# Create the output folder
+output_folder = export.create_output_folder(scenario_name, days, n_blocks, n_iterations)
+
 """
 MonteCarlo
 """
@@ -172,13 +175,19 @@ for i in range(0, n_iterations):
         wt_canal_arr[coords] = wt_canals[canaln]
 
     (
-        dry_peat_volume,
         cumulative_Vdp,
+        dry_peat_volume,
         avg_wt_over_time,
         wt_track_drained,
         wt_track_notdrained,
-        avg_wt,
-        timestep_data
+        timestep_data,
+        rast_D_before,
+        rast_cwl_before,
+        rast_dem_before,
+        rast_elev_phi_before, 
+        rast_D_after, 
+        rast_cwl_after,
+        rast_elev_phi_after
     ) = hydro.hydrology(
         'transient', nx, ny, dx, dy, days, ele, phi_ini, catchment_mask, 
         wt_canal_arr, boundary_arr, peat_type_mask=peat_type_masked, 
@@ -195,6 +204,22 @@ for i in range(0, n_iterations):
         'dry_peat_volume(%) = ', dry_peat_volume / cum_vdp_nodams * 100.0, '\n',
         'water_blocked_canals = ', water_blocked_canals
     )
+    
+    # Export raster data
+    raster_variables = [
+        ('rast_D_before', rast_D_before),
+        ('rast_cwl_before', rast_cwl_before),
+        ('rast_dem_before', rast_dem_before),
+        ('rast_elev_phi_before', rast_elev_phi_before),
+        ('rast_D_after', rast_D_after),
+        ('rast_cwl_after', rast_cwl_after),
+        ('rast_elev_phi_after', rast_elev_phi_after),
+    ]
+    for var_name, raster_array in raster_variables:
+        filename = f"{var_name}_{scenario_name}_{days}_{n_blocks}_{n_iterations}.tif"
+        output_path = os.path.join(output_folder, filename)
+        metadata = {'description': f'{var_name} for scenario {scenario_name}', 'unit': 'please add unit here'}
+        export.export_raster_to_geotiff(raster_array, output_path, dem_rst_fn, metadata)
 
     """
     Final printings
@@ -208,9 +233,6 @@ for i in range(0, n_iterations):
                 + str(time.ctime()) + "    " + str(water_blocked_canals)
             )
 
-
-# Create the output folder
-output_folder = export.create_output_folder(scenario_name, days, n_blocks, n_iterations) 
 
 # Export timeseries data
 export.export_timeseries_to_csv(timestep_data, output_folder, scenario_name, n_blocks, days) 

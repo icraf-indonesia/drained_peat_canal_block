@@ -1,6 +1,7 @@
 import os
 import re
 import csv
+import rasterio
 
 def create_output_folder(scenario_name, days, n_blocks, n_iterations):
     """Creates an output folder for the simulation scenario."""
@@ -42,3 +43,26 @@ def export_timeseries_to_csv(timestep_data, output_folder, scenario_name, n_bloc
 
         # Write timestep data rows
         writer.writerows(timestep_data)
+        
+def export_raster_to_geotiff(raster_array, output_path, template_raster, metadata):
+    """Exports a raster array to a GeoTIFF file.
+
+    Args:
+        raster_array (numpy.ndarray): The raster array to export.
+        output_path (str): The full path to the output GeoTIFF file.
+        template_raster (str): Path to a template raster for geospatial metadata.
+        metadata (dict): A dictionary of metadata to add to the GeoTIFF file.
+    """
+    with rasterio.open(template_raster) as src:
+        profile = src.profile.copy()
+
+    profile.update(
+        dtype=raster_array.dtype,
+        count=1,
+        height=raster_array.shape[0],
+        width=raster_array.shape[1],
+    )
+
+    with rasterio.open(output_path, 'w', **profile) as dst:
+        dst.write(raster_array, 1)
+        dst.update_tags(**metadata)

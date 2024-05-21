@@ -187,10 +187,11 @@ def hydrology(solve_mode, nx, ny, dx, dy, days, ele, phi_initial, catchment_mask
    
     largeValue=1e20                                                     # value needed in implicit source term to apply internal boundaries
     
+    # Get raster arrays before the computation
+    rast_D_before, rast_cwl_before, rast_dem_before, rast_elev_phi_before = get_rasters(ny, nx, peat_type_mask, phi.value - ele, httd, tra_to_cut, cmask, drmask_not, ele, wt_canal_arr, dr, catchment_mask)
     
     if plotOpt:
-        # Get raster arrays before the computation
-        rast_D_before, rast_cwl_before, rast_dem_before, rast_elev_phi_before = get_rasters(ny, nx, peat_type_mask, phi.value - ele, httd, tra_to_cut, cmask, drmask_not, ele, wt_canal_arr, dr, catchment_mask)
+        
     
         # Plot raster arrays before the computation
         big_4_raster_plot(title='Before the computation',
@@ -259,6 +260,7 @@ def hydrology(solve_mode, nx, ny, dx, dy, days, ele, phi_initial, catchment_mask
     timestep_data = []
     
     cumulative_Vdp = 0.
+    dry_peat_volume = 0.0
                                                              
     #********Finite volume computation******************
     for d in range(days):
@@ -340,12 +342,13 @@ def hydrology(solve_mode, nx, ny, dx, dy, days, ele, phi_initial, catchment_mask
        
         # Areas with WT <-1.0; areas with WT >0
 #        #plot_raster_by_value((ele-phi.value).reshape(ny,nx), title="ele-phi in the end, colour keys", bottom_value=0.5, top_value=0.01)
-        
-        
+    
+    # Get raster arrays after the computation   
+    rast_D_after, rast_cwl_after, rast_dem_after, rast_elev_phi_after = get_rasters(ny, nx, peat_type_mask, phi.value - ele, httd, tra_to_cut, cmask, drmask_not, ele, wt_canal_arr, dr, catchment_mask)
+    
     if plotOpt:
-        # Get raster arrays after the computation
-        rast_D_after, rast_cwl_after, rast_dem_after, rast_elev_phi_after = get_rasters(ny, nx, peat_type_mask, phi.value - ele, httd, tra_to_cut, cmask, drmask_not, ele, wt_canal_arr, dr, catchment_mask)
-        # Plot raster arrays after the computation
+        
+               # Plot raster arrays after the computation
         big_4_raster_plot(title='After the computation',
             raster1= rast_D_after,
             raster2= rast_cwl_after,
@@ -379,14 +382,19 @@ def hydrology(solve_mode, nx, ny, dx, dy, days, ele, phi_initial, catchment_mask
 #    change_in_canals = (ele-phi.value).reshape(ny,nx)*(drmask.value.reshape(ny,nx)) - ((ele-H)*drmask.value).reshape(ny,nx)
 #    resulting_phi = phi.value.reshape(ny,nx)
     avg_wt_over_time = np.mean(np.array(avg_wt))
-    #print("timestep_data:", timestep_data)
     print("Length of timestep_data:", len(timestep_data))
     return (
-        dry_peat_volume,
         cumulative_Vdp,
+        dry_peat_volume,
         avg_wt_over_time,
         wt_track_drained,
         wt_track_notdrained,
-        avg_wt,
-        timestep_data 
+        timestep_data,
+        rast_D_before, 
+        rast_cwl_before, 
+        rast_dem_before, 
+        rast_elev_phi_before,
+        rast_D_after, 
+        rast_cwl_after, 
+        rast_elev_phi_after
     )
