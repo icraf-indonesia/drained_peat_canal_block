@@ -13,7 +13,6 @@ import pickle
 import yaml
 import numpy as np
 import matplotlib.pyplot as plt
-
 import preprocess_data
 import utilities
 import hydro
@@ -236,6 +235,10 @@ for i in range(0, n_iterations):
 
 # Export timeseries data
 export.export_timeseries_to_csv(timestep_data, output_folder, scenario_name, n_blocks, days) 
+
+# Export simulation summary
+export.export_simulation_summary(output_folder, scenario_name, days, n_iterations, n_blocks,
+                                    i, water_blocked_canals, avg_wt_over_time, cumulative_Vdp)
 
 """
 Save WTD data if simulating a year

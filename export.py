@@ -2,6 +2,7 @@ import os
 import re
 import csv
 import rasterio
+import time
 
 def create_output_folder(scenario_name, days, n_blocks, n_iterations):
     """Creates an output folder for the simulation scenario."""
@@ -66,3 +67,32 @@ def export_raster_to_geotiff(raster_array, output_path, template_raster, metadat
     with rasterio.open(output_path, 'w', **profile) as dst:
         dst.write(raster_array, 1)
         dst.update_tags(**metadata)
+
+
+def export_simulation_summary(output_folder, scenario_name, days, n_iterations, n_blocks, 
+                                i, water_blocked_canals, avg_wt_over_time, cumulative_Vdp):
+    """Exports the overall simulation summary to a CSV file.
+
+    Args:
+        # ... (Your existing docstring arguments)
+    """
+    filename = f"{scenario_name}_summary_{days}_{n_blocks}_{n_iterations}.csv"
+    filepath = os.path.join(output_folder, filename)
+
+    # Create the CSV file
+    with open(filepath, 'w', newline='') as csvfile:
+        fieldnames = ['Time', 'Days', 'Iterations', 'Blocks', 'Current Iteration', 
+                      'Water Blocked Canals (m)', 'Avg WTD (m)', 'Cumulative Vdp (m^3)']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+        writer.writeheader() # Write the header row
+        writer.writerow({  # Write the data row
+            'Time': time.ctime(),
+            'Days': days,
+            'Iterations': n_iterations,
+            'Blocks': n_blocks,
+            'Current Iteration': i,
+            'Water Blocked Canals (m)': f"{water_blocked_canals:.2f}", 
+            'Avg WTD (m)': f"{avg_wt_over_time:.2f}",
+            'Cumulative Vdp (m^3)': f"{cumulative_Vdp:.2f}" 
+        })
