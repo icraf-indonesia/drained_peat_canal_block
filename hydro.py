@@ -92,7 +92,7 @@ def get_rasters(ny, nx, peat_type_mask, gwt, httd, tra_to_cut, cmask, drmask_not
     
 
 def hydrology(solve_mode, nx, ny, dx, dy, days, ele, phi_initial, catchment_mask, wt_canal_arr, boundary_arr,
-              peat_type_mask, httd, tra_to_cut, sto_to_cut, 
+              peat_type_mask, httd, tra_to_cut, sto_to_cut, track_WT_drained_area, track_WT_notdrained_area,
               diri_bc=0.0, neumann_bc = None, plotOpt=False, remove_ponding_water=True, P=0.0, ET=0.0, dt=1.0):
     """
     INPUT:
@@ -113,11 +113,7 @@ def hydrology(solve_mode, nx, ny, dx, dy, days, ele, phi_initial, catchment_mask
         - ET: Numpy array of length the number of days. mm/day.
         - dt: float. Timestep in days. Defaults to 1.
     """
-#    dneg = []
    
-    # define location of points whose WTD to track in the dem
-    track_WT_drained_area = (239,166)
-    track_WT_notdrained_area = (522,190)
     
     ele[~catchment_mask] = 0.
     ele = ele.flatten()
@@ -259,6 +255,8 @@ def hydrology(solve_mode, nx, ny, dx, dy, days, ele, phi_initial, catchment_mask
     avg_wt = []
     wt_track_drained = []
     wt_track_notdrained = []
+    # Create a list to store timestep data
+    timestep_data = []
     
     cumulative_Vdp = 0.
                                                              
@@ -321,9 +319,17 @@ def hydrology(solve_mode, nx, ny, dx, dy, days, ele, phi_initial, catchment_mask
         peat_vol_weights = utilities.PeatV_weight_calc(np.array(~dr * catchment_mask * not_peat, dtype=int))
         dry_peat_volume = utilities.PeatVolume(peat_vol_weights, (ele-phi.value).reshape(ny,nx))
         cumulative_Vdp = cumulative_Vdp + dry_peat_volume
+        # Append timestep data to the list 
+        timestep_data.append([
+            d,
+            P[d] if isinstance(P, np.ndarray) else P,
+            ET[d] if isinstance(ET, np.ndarray) else ET,
+            dry_peat_volume,
+            wt_track_drained[-1],
+            wt_track_notdrained[-1],
+            avg_wt[-1] 
+        ])
         print("avg_wt  = ", np.average(phi.value-ele))
-#        print "wt drained = ", (phi.value - ele).reshape(ny,nx)[track_WT_drained_area]
-#        print "wt not drained = ", (phi.value - ele).reshape(ny,nx)[track_WT_notdrained_area]
         print("Cumulative vdp = ", cumulative_Vdp)
         
     if solve_mode=='steadystate': #solving in steadystate we remove water only at the very end
@@ -332,9 +338,8 @@ def hydrology(solve_mode, nx, ny, dx, dy, days, ele, phi_initial, catchment_mask
             phi.setValue(s)                                                # set new values for water table
     
        
-       
         # Areas with WT <-1.0; areas with WT >0
-#        plot_raster_by_value((ele-phi.value).reshape(ny,nx), title="ele-phi in the end, colour keys", bottom_value=0.5, top_value=0.01)
+#        #plot_raster_by_value((ele-phi.value).reshape(ny,nx), title="ele-phi in the end, colour keys", bottom_value=0.5, top_value=0.01)
         
         
     if plotOpt:
@@ -369,9 +374,19 @@ def hydrology(solve_mode, nx, ny, dx, dy, days, ele, phi_initial, catchment_mask
     
         plt.show()
         
+        
+        
 #    change_in_canals = (ele-phi.value).reshape(ny,nx)*(drmask.value.reshape(ny,nx)) - ((ele-H)*drmask.value).reshape(ny,nx)
 #    resulting_phi = phi.value.reshape(ny,nx)
-        
-    avg_wt_over_time = np.mean(np.array(avg_wt))        
-    
-    return dry_peat_volume, wt_track_drained, wt_track_notdrained, np.mean(np.array(avg_wt)), (rast_D_before, rast_cwl_before, rast_dem_before, rast_elev_phi_before), (rast_D_after, rast_cwl_after, rast_dem_after, rast_elev_phi_after)
+    avg_wt_over_time = np.mean(np.array(avg_wt))
+    #print("timestep_data:", timestep_data)
+    print("Length of timestep_data:", len(timestep_data))
+    return (
+        dry_peat_volume,
+        cumulative_Vdp,
+        avg_wt_over_time,
+        wt_track_drained,
+        wt_track_notdrained,
+        avg_wt,
+        timestep_data 
+    )
