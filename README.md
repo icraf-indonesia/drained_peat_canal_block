@@ -160,7 +160,7 @@ Here’s the format of a YAML file that you can modify to change the values of d
 
 *The parameters are grouped under sections like "general", "hydrology”, "data", and “dams”, making them easy to understand and modify.*
 
-```
+```yaml
 general:
   days: 3 # Number of days used to simulate the Monte Carlo simulations
   n_blocks: 0 # Number of canal blocks to be placed in the peatland.

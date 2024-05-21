@@ -696,12 +696,11 @@ approach provides a clean and human-readable format for defining
 parameters and makes it easy to modify them without changing the Python
 code.</p>
 <p>Here’s the format of a YAML file that you can modify to change the
-values of data &amp; parameters and save it as a parameter list for a
-scenario:</p>
+values of data &amp; parameters and save it as a scenario:</p>
 <p><em>The parameters are grouped under sections like “general”,
 “hydrology”, “data”, and “dams”, making them easy to understand and
 modify.</em></p>
-<pre><code>general:
+<pre class="yaml"><code>general:
   days: 3 # Number of days used to simulate the Monte Carlo simulations
   n_blocks: 0 # Number of canal blocks to be placed in the peatland.
   n_iterations: 1 #Number of iterations for the Monte Carlo simulation or optimization algorithm
