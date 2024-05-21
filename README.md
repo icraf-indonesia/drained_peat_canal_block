@@ -150,9 +150,46 @@ There are certain guidelines you need to follow to prepare data for simulation:
 
 3.  To prepare the precipitation data, use data from a nearby weather station in the study site. If no local data is available, use [Ogimet](https://www.ogimet.com/home.phtml.en), following the provided [Ogimet tutorial](https://www.ogimet.com/gsynres.phtml.en). Ensure the preparation of precipitation tabular data aligns with the template references for [`rainfall_fn`](https://github.com/icraf-indonesia/drained_peat_canal_block/blob/main/data/original_data/params.xlsx).
 
-4.  The list of parameters in the YAML file below should be filled according to the user's desired scenario. This parameterization process will be more accurate if consulted with an expert. If expert consultation is not possible, please refer to the original publication for guidance.
+4.  The list of parameters should be filled according to the user's desired scenario. This parameterization process will be more accurate if consulted with an expert. If expert consultation is not possible, please refer to the original publication for guidance.
 
-    ![*YAML file structure*](images/yaml.png)
+### Use configuration files (YAML) to store model parameters
+
+Consider storing model parameters in a separate YAML file. This approach provides a clean and human-readable format for defining parameters and makes it easy to modify them without changing the Python code.
+
+Here’s the format of a YAML file that you can modify to change the values of data & parameters and save it as a scenario:
+
+*The parameters are grouped under sections like "general", "hydrology”, "data", and “dams”, making them easy to understand and modify.*
+
+```
+general:
+  days: 3 # Number of days used to simulate the Monte Carlo simulations
+  n_blocks: 0 # Number of canal blocks to be placed in the peatland.
+  n_iterations: 1 #Number of iterations for the Monte Carlo simulation or optimization algorithm
+  hand_made_dams: False # Enable or disable using hand-picked dams
+
+hydrology:
+  block_height: 0.4 #The height of the canal blocks used to raise water levels, in meters (m).
+  canal_water_level: 1.2 # The initial water level in the canals, relative to the DEM elevation, in meters (m).
+  diri_bc: 0.0 #The Dirichlet boundary condition value, representing the fixed hydraulic head at the model boundaries, in meters (m).
+  hini: 0.0 #The initial hydraulic head (water level) above the DEM elevation, in meters (m).
+  P: 0.0 # Precipitation (mm/day)
+  ET: 3.0 # Evapotranspiration (mm/day)
+  timestep: 1.0 #Time step for the transient simulation (in days).
+  Kadjust: 1.5 # Hydraulic conductivity adjustment factor for sapric peat. Unitless (multiplier for hydraulic conductivity).
+
+data:
+  dem_rst_fn: "data/original_data/DTM_metres_clip.tif"
+  can_rst_fn: "data/original_data/canals_clip.tif"
+  peat_depth_rst_fn: "data/original_data/Peattypedepth_clip.tif"
+  rainfall_fn: "data/original_data/2012_rainfall.xlsx"
+
+dams: # New sections for dam locations
+  hand_picked_dams: [6959, 901, 945, 9337, 10089, 7627, 1637, 7863, 7148, 7138, 3450, 1466, 420, 4608, 4303, 6908, 9405, 8289, 7343, 2534, 9349, 6272, 8770, 2430, 2654, 6225, 11152, 118, 4013, 3381, 6804, 6614, 7840, 9839, 5627, 3819, 7971, 402, 6974, 7584, 3188, 8316, 1521, 856, 770, 6504, 707, 5478, 5512, 1732, 3635, 1902, 2912, 9220, 1496, 11003, 8371, 10393, 2293, 4901, 5892, 6110, 2118, 4485, 6379, 10300, 6451, 5619, 9871, 9502, 1737, 4368, 7290, 9071, 11222, 3085, 2013, 5226, 597, 5038]
+                     
+tracking:
+  track_WT_drained_area: [239, 166]
+  track_WT_notdrained_area: [522, 190]
+```
 
 ## How to simulate canal blocking?
 
