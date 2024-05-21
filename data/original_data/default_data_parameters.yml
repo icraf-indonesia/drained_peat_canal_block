@@ -1,9 +1,12 @@
+# --- START OF FILE config.yaml ---
 general:
-  days: 3 # Number of days used to simulate the Monte Carlo simulations
+  scenario_name: "baseline" # Name of the simulation scenario
+  days: 2 # Number of days used to simulate the Monte Carlo simulations
   n_blocks: 0 # Number of canal blocks to be placed in the peatland.
   n_iterations: 1 #Number of iterations for the Monte Carlo simulation or optimization algorithm
   hand_made_dams: False # Enable or disable using hand-picked dams
-
+ 
+  
 hydrology:
   block_height: 0.4 #The height of the canal blocks used to raise water levels, in meters (m).
   canal_water_level: 1.2 # The initial water level in the canals, relative to the DEM elevation, in meters (m).
@@ -32,5 +35,5 @@ dams: # New sections for dam locations
                      5226, 597, 5038]
                      
 tracking:
-  wt_track_drained: [239, 166]
-  wt_track_notdrained: [522, 190]
+  wt_track_drained_area: [239, 166]
+  wt_track_notdrained_area: [522, 190]
