@@ -28,7 +28,7 @@ plt.close("all")
 
 config_file = "data/original_data/default_data_parameters.yml"
 
-
+start_time = time.time()
 """
 Load configuration from YAML file
 """
@@ -217,7 +217,7 @@ for i in range(0, n_iterations):
     for var_name, raster_array in raster_variables:
         filename = f"{var_name}_{scenario_name}_{days}_{n_blocks}_{n_iterations}.tif"
         output_path = os.path.join(output_folder, filename)
-        metadata = {'description': f'{var_name} for scenario {scenario_name}', 'unit': 'please add unit here'}
+        metadata = {'description': f'{var_name} for scenario {scenario_name}'}
         export.export_raster_to_geotiff(raster_array, output_path, dem_rst_fn, metadata)
 
     """
@@ -233,30 +233,27 @@ for i in range(0, n_iterations):
             )
 
 
+"""
+Export tabular data and canal network map
+"""
 # Export timeseries data
 export.export_timeseries_to_csv(timestep_data, output_folder, scenario_name, n_blocks, days) 
 
 # Export simulation summary
 export.export_simulation_summary(output_folder, scenario_name, days, n_iterations, n_blocks,
                                     i, water_blocked_canals, avg_wt_over_time, cumulative_Vdp)
+                                    
+end_time = time.time()
 
-"""
-Save WTD data if simulating a year
-"""
-fname = r'output/wtd_year_' + str(n_blocks) + '.txt'
+# Export metadata
+export.export_metadata(output_folder, scenario_name, config, start_time, end_time) 
 
-if days > 300:
-    with open(fname, 'a') as output_file:
-        output_file.write(
-            "\n %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n" 
-            + str(time.ctime()) + " nblocks = " + str(n_blocks) + " ET = " + str(et[0])
-            + '\n' + 'drained notdrained mean'
-        )
-        for j in range(len(wt_track_drained)):
-            output_file.write(
-                "\n" + str(wt_track_drained[j]) + " " + str(wt_track_notdrained[j]) + " " 
-                + str(avg_wt_over_time[j])
-            )
+# Export the cr array (canal network) to GeoTIFF
+cr = cr.astype(np.float32)  # Or the appropriate data type
+filename = f"cr_{scenario_name}_{days}_{n_blocks}_{n_iterations}.tif"
+output_path = os.path.join(output_folder, filename)
+metadata = {'description': f'Canal raster for scenario {scenario_name}'}
+export.export_raster_to_geotiff(cr, output_path, dem_rst_fn, metadata)
 
 """
 Water Table Response to Drainage Over Time

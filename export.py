@@ -3,6 +3,8 @@ import re
 import csv
 import rasterio
 import time
+import yaml
+import numpy as np
 
 def create_output_folder(scenario_name, days, n_blocks, n_iterations):
     """Creates an output folder for the simulation scenario."""
@@ -45,7 +47,8 @@ def export_timeseries_to_csv(timestep_data, output_folder, scenario_name, n_bloc
         # Write timestep data rows
         writer.writerows(timestep_data)
         
-def export_raster_to_geotiff(raster_array, output_path, template_raster, metadata):
+
+def export_raster_to_geotiff(raster_array, output_path, template_raster, metadata, nodata_value=None):
     """Exports a raster array to a GeoTIFF file.
 
     Args:
@@ -53,6 +56,7 @@ def export_raster_to_geotiff(raster_array, output_path, template_raster, metadat
         output_path (str): The full path to the output GeoTIFF file.
         template_raster (str): Path to a template raster for geospatial metadata.
         metadata (dict): A dictionary of metadata to add to the GeoTIFF file.
+        nodata_value (optional, float): Specific no data value to set for the raster. Defaults to None.
     """
     with rasterio.open(template_raster) as src:
         profile = src.profile.copy()
@@ -63,6 +67,9 @@ def export_raster_to_geotiff(raster_array, output_path, template_raster, metadat
         height=raster_array.shape[0],
         width=raster_array.shape[1],
     )
+
+    if nodata_value is not None:
+        profile.update(nodata=nodata_value)
 
     with rasterio.open(output_path, 'w', **profile) as dst:
         dst.write(raster_array, 1)
@@ -96,3 +103,32 @@ def export_simulation_summary(output_folder, scenario_name, days, n_iterations, 
             'Avg WTD (m)': f"{avg_wt_over_time:.2f}",
             'Cumulative Vdp (m^3)': f"{cumulative_Vdp:.2f}" 
         })
+
+
+def export_metadata(output_folder, scenario_name, config, start_time, end_time):
+    """Exports simulation metadata to a YAML file.
+
+    Args:
+        output_folder (str): Path to the output folder.
+        scenario_name (str): Name of the simulation scenario.
+        config (dict): The loaded YAML configuration.
+        start_time (float): Time at the start of the simulation.
+        end_time (float): Time at the end of the simulation.
+    """
+    elapsed_time_seconds = int(end_time - start_time)  # Convert to integer to remove decimals
+
+    metadata = {
+        'scenario_name': scenario_name,
+        'date_time': time.ctime(),
+        'elapsed_time': f"{elapsed_time_seconds} seconds",  # Add seconds unit
+        'parameters': config['hydrology'],
+        'data_paths': config['data'],
+        'tracking_locations': config['tracking'], 
+        # Add other relevant metadata as needed
+    }
+
+    filename = f"{scenario_name}_metadata.yaml" 
+    filepath = os.path.join(output_folder, filename)
+
+    with open(filepath, 'w') as f:
+        yaml.dump(metadata, f, indent=4)
