@@ -80,11 +80,14 @@ def export_raster_to_geotiff(raster_array, output_path, template_raster, metadat
         dst.update_tags(**metadata)
 
 def export_simulation_summary(output_folder, scenario_name, days, n_iterations, n_blocks,
-                                i, water_blocked_canals, avg_wt_over_time, cumulative_Vdp):
+                                i, water_blocked_canals, avg_wt_over_time, cumulative_Vdp, 
+                                total_co2_emissions=None): # Add total_co2_emissions as optional argument
     """Exports the overall simulation summary to a CSV file.
 
     Args:
         # ... (Your existing docstring arguments)
+        total_co2_emissions (float, optional): Total annual CO2 emissions (Mg). 
+            Defaults to None (not included in summary if None).
     """
     filename = f"{scenario_name}_summary_{days}_{n_blocks}_{n_iterations}.csv"
     filepath = os.path.join(output_folder, filename)
@@ -93,10 +96,16 @@ def export_simulation_summary(output_folder, scenario_name, days, n_iterations, 
     with open(filepath, 'w', newline='') as csvfile:
         fieldnames = ['Time', 'Days', 'Iterations', 'Blocks', 'Current Iteration',
                       'Water Blocked Canals (m)', 'Avg WTD (m)', 'Cumulative Vdp (m^3)']
+        
+        # Add 'Total CO2 Emissions (Mg)' to fieldnames if provided
+        if total_co2_emissions is not None:
+            fieldnames.append('Total CO2 Emissions (Mg)') 
+        
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
         writer.writeheader()  # Write the header row
-        writer.writerow({  # Write the data row
+        
+        data_row = {  # Start building the data row
             'Time': time.ctime(),
             'Days': days,
             'Iterations': n_iterations,
@@ -105,7 +114,13 @@ def export_simulation_summary(output_folder, scenario_name, days, n_iterations, 
             'Water Blocked Canals (m)': f"{water_blocked_canals:.2f}",
             'Avg WTD (m)': f"{avg_wt_over_time:.2f}",
             'Cumulative Vdp (m^3)': f"{cumulative_Vdp:.2f}"
-        })
+        }
+        
+        # Add total CO2 emissions to the data row if provided
+        if total_co2_emissions is not None:
+            data_row['Total CO2 Emissions (Mg)'] = f"{total_co2_emissions:.2f}" 
+
+        writer.writerow(data_row) # Write the data row
 
 
 def export_metadata(output_folder, scenario_name, config, start_time, end_time):
