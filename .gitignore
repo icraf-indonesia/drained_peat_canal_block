@@ -161,3 +161,5 @@ cython_debug/
 
 
 /output
+geom_comparison.py
+srtm_landczos.R
