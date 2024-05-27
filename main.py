@@ -53,7 +53,7 @@ dry_period = config['hydrology']['dry_period']
 
 # coefficients for WTD-CO2 emissions relationship
 ALPHA = config['co2_em']['ALPHA']
-BETA = config['co2_em']['BETHA']
+BETA = config['co2_em']['BETA']
 
 # Data File Paths
 dem_rst_fn = config['data']['dem_rst_fn']
