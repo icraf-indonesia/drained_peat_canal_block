@@ -8,6 +8,7 @@ import numpy as np
 import fipy as fp
 import matplotlib.pyplot as plt
 import copy
+import os
 from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable # for plots
 
 
@@ -23,9 +24,9 @@ ALPHA = 74.11  # Mg/ha/yr/m
 BETA = 29.34   # Mg/ha/yr
 
 
-def big_4_raster_plot(title, raster1, raster2, raster3, raster4):
+def big_4_raster_plot(title, raster1, raster2, raster3, raster4, output_folder): 
     """
-    Plots four raster arrays in a 2x2 grid.
+    Plots four raster arrays in a 2x2 grid and saves the plot as a PNG file.
 
     Args:
         title (str): Title for the entire plot.
@@ -33,6 +34,7 @@ def big_4_raster_plot(title, raster1, raster2, raster3, raster4):
         raster2 (numpy.ndarray): Raster array for the top right plot (canal water level).
         raster3 (numpy.ndarray): Raster array for the bottom left plot (DEM).
         raster4 (numpy.ndarray): Raster array for the bottom right plot (elevation - phi).
+        output_folder (str): Path to the folder where the plot should be saved.
     """
     fig1, axes1 = plt.subplots(nrows=2, ncols=2, figsize=(16, 12), dpi=80)
     fig1.suptitle(title)
@@ -60,9 +62,16 @@ def big_4_raster_plot(title, raster1, raster2, raster3, raster4):
     cax4 = ax4_divider.append_axes('right', size='7%', pad='2%')
     plt.colorbar(d, cax=cax4)
     axes1[1, 1].set(title="elevation - phi")
+    
+    # Save the plot as PNG
+    plot_filename = f"{title.replace(' ', '_')}.png" # Replace spaces with underscores in filename
+    plot_filepath = os.path.join(output_folder, plot_filename) 
+    plt.savefig(plot_filepath)
+    plt.close(fig1) # Close the figure to release resources
 
 
-def plot_line_of_peat(raster, y_value, title, nx, ny, label, color, linewidth=1.):
+def plot_line_of_peat(raster, y_value, title, nx, ny, label, color, 
+    linewidth=1., output_folder=None):
     """
     Plots a cross-section of a raster array at a specified y-value.
 
@@ -75,13 +84,49 @@ def plot_line_of_peat(raster, y_value, title, nx, ny, label, color, linewidth=1.
         label (str): Label for the plot line.
         color (str): Color of the plot line.
         linewidth (float, optional): Width of the plot line. Defaults to 1.0.
+        output_folder (str, optional): Path to the folder where the plot should be saved. Defaults to None (no saving).
     """
     plt.figure(10)
     plt.title(title)
     plt.plot(raster[y_value, :], label=label, color=color, linewidth=linewidth)
     plt.legend(fontsize='x-large')
+    
+    if output_folder is not None:
+        plot_filename = f"{title.replace(' ', '_')}.png"
+        plot_filepath = os.path.join(output_folder, plot_filename)
+        plt.savefig(plot_filepath)
+        plt.close() # Close the figure 
 
+def plot_hydro_params(httd, avg_wt, output_folder):
+    """
+    Plots hydraulic parameters and average water table depth over time, saving the plot to a PNG file.
 
+    Args:
+        httd (dict): Dictionary containing hydraulic properties.
+        avg_wt (list): Average water table depth over time.
+        output_folder (str): Path to the folder where the plot should be saved.
+    """
+    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(12, 9), dpi=80)
+    x = np.arange(-21, 1, 0.1)
+
+    axes[0, 0].plot(httd[1]['hToTra'](x), x)
+    axes[0, 0].set(title='hToTra', ylabel='depth')
+
+    axes[0, 1].plot(httd[1]['C'](x), x)
+    axes[0, 1].set(title='C')
+
+    axes[1, 0].plot()  # This subplot seems to be intentionally left empty
+    axes[1, 0].set(title="Nothing") 
+
+    axes[1, 1].plot(avg_wt)
+    axes[1, 1].set(title="avg_wt_over_time")
+
+    # Save the plot as a PNG file
+    plot_filename = "hydrological_parameters.png"
+    plot_filepath = os.path.join(output_folder, plot_filename)
+    plt.savefig(plot_filepath)
+    plt.close(fig) # Close the figure
+    
 def get_rasters(ny, nx, peat_type_mask, gwt, httd, tra_to_cut, cmask, drmask_not, ele, wt_canal_arr, dr, catchment_mask):
     """
     Compute and return the four raster arrays used in the big_4_raster_plot function.
@@ -113,7 +158,8 @@ def get_rasters(ny, nx, peat_type_mask, gwt, httd, tra_to_cut, cmask, drmask_not
 
 def hydrology(solve_mode, nx, ny, dx, dy, days, ele, phi_initial, catchment_mask, wt_canal_arr, boundary_arr,
               peat_type_mask, httd, tra_to_cut, sto_to_cut, track_WT_drained_area, track_WT_notdrained_area,
-              diri_bc=0.0, neumann_bc=None, plotOpt=False, remove_ponding_water=True, P=0.0, ET=0.0, dt=1.0, n_day_avg=3):
+              diri_bc=0.0, neumann_bc=None, plotOpt=False, remove_ponding_water=True, P=0.0, ET=0.0, dt=1.0, 
+              n_day_avg=3, output_folder=None, y_value=270):
     """
     Simulates peatland hydrology using the Boussinesq equation.
 
@@ -246,10 +292,9 @@ def hydrology(solve_mode, nx, ny, dx, dy, days, ele, phi_initial, catchment_mask
                           raster1=rast_D_before,
                           raster2=rast_cwl_before,
                           raster3=rast_dem_before,
-                          raster4=rast_elev_phi_before)
+                          raster4=rast_elev_phi_before,
+                          output_folder=output_folder)
         plt.show()
-        # for later cross-section plots
-        y_value = 270
 
         #        print "first cross-section plot"
         #        ele_with_can = copy.copy(ele).reshape(ny,nx)
@@ -330,7 +375,8 @@ def hydrology(solve_mode, nx, ny, dx, dy, days, ele, phi_initial, catchment_mask
         if plotOpt and d != 0:
             # print "one more cross-section plot"
             plot_line_of_peat(phi.value.reshape(
-                ny, nx), y_value=y_value, title="cross-section", color='cornflowerblue', nx=nx, ny=ny, label=d)
+                ny, nx), y_value=y_value, title="cross-section", color='cornflowerblue', nx=nx, ny=ny, label=d, 
+                             output_folder=output_folder)
 
         res = 0.0
 
@@ -414,28 +460,22 @@ def hydrology(solve_mode, nx, ny, dx, dy, days, ele, phi_initial, catchment_mask
                           raster1=rast_D_after,
                           raster2=rast_cwl_after,
                           raster3=rast_dem_after,
-                          raster4=rast_elev_phi_after
-                          )
+                          raster4=rast_elev_phi_after,
+                          output_folder=output_folder)
 
         plt.show()
 
-        fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(12, 9), dpi=80)
-        x = np.arange(-21, 1, 0.1)
-        axes[0, 0].plot(httd[1]['hToTra'](x), x)
-        axes[0, 0].set(title='hToTra', ylabel='depth')
-        axes[0, 1].plot(httd[1]['C'](x), x)
-        axes[0, 1].set(title='C')
-        axes[1, 0].plot()
-        axes[1, 0].set(title="Nothing")
-        axes[1, 1].plot(avg_wt)
-        axes[1, 1].set(title="avg_wt_over_time")
+        plot_hydro_params(httd, avg_wt, output_folder=output_folder)
+        
+        plt.show()
 
         # plot surface in cross-section
         ele_with_can = copy.copy(ele).reshape(ny, nx)
         ele_with_can = ele_with_can * catchment_mask
         ele_with_can[wt_canal_arr > 0] = wt_canal_arr[wt_canal_arr > 0]
         plot_line_of_peat(ele_with_can, y_value=y_value, title="cross-section", nx=nx,
-                         ny=ny, label="surface", color='peru', linewidth=2.0)
+                         ny=ny, label="surface", color='peru', linewidth=2.0,
+                         output_folder=output_folder)
 
         plt.show()
 
@@ -456,7 +496,6 @@ def hydrology(solve_mode, nx, ny, dx, dy, days, ele, phi_initial, catchment_mask
         rast_elev_phi_before,
         rast_D_after,
         rast_cwl_after,
-        rast_dem_after,
         rast_elev_phi_after,
         avg_wtd_nday  # Return n-day average WTD
     )

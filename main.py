@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
 """
-Created on Thu Oct 11 13:13:45 2018
-
-@author: L1817
+Simulates peatland hydrology and exports results.
 """
 
 import os
@@ -13,6 +10,7 @@ import pickle
 import yaml
 import numpy as np
 import matplotlib.pyplot as plt
+
 import preprocess_data
 import utilities
 import hydro
@@ -26,49 +24,59 @@ os.environ['GDAL_DATA'] = CONDA_ENV_PATH + '/Library/share/gdal'
 
 plt.close("all")
 
-config_file = "data/original_data/default_data_parameters.yml"
 
 start_time = time.time()
-"""
-Load configuration from YAML file
-"""
+
+config_file = "data/original_data/default_data_parameters_rand_blocks.yml"
+
+# Load Configuration
 with open(config_file, 'r') as file:
     config = yaml.safe_load(file)
 
-# Access parameters from the configuration
+# General Configuration
 scenario_name = config['general']['scenario_name']
 days = config['general']['days']
 n_blocks = config['general']['n_blocks']
 n_iterations = config['general']['n_iterations']
 hand_made_dams = config['general']['hand_made_dams']
+peat_raster_values = config['general']['peat_raster_values']
 
+# Hydrology Parameters
 block_height = config['hydrology']['block_height']
 canal_water_level = config['hydrology']['canal_water_level']
 diri_bc = config['hydrology']['diri_bc']
 hini = config['hydrology']['hini']
-et = config['hydrology']['ET'] * np.ones(days)  # Create an array for ET
+et = config['hydrology']['ET'] * np.ones(days)
 timestep = config['hydrology']['timestep']
 kadjust = config['hydrology']['Kadjust']
+dry_period = config['hydrology']['dry_period']
 
+# coefficients for WTD-CO2 emissions relationship
+ALPHA = config['co2_em']['ALPHA']
+BETA = config['co2_em']['BETHA']
+
+# Data File Paths
 dem_rst_fn = config['data']['dem_rst_fn']
 can_rst_fn = config['data']['can_rst_fn']
 peat_depth_rst_fn = config['data']['peat_depth_rst_fn']
 rainfall_fn = config['data']['rainfall_fn']
 
+# Dam Placement (Hand-picked)
 hand_picked_dams = config['dams']['hand_picked_dams']
 
-# Load WTD tracking areas from YAML
+# Tracking Locations
 wt_track_drained_area = tuple(config['tracking']['wt_track_drained_area'])
 wt_track_notdrained_area = tuple(config['tracking']['wt_track_notdrained_area'])
+wt_crosssection_y_val = config['tracking']['wt_crosssection_y_val']
 
-cum_vdp_nodams = 21088.453521509597  # Value of dry peat volume without blocks, without precipitation for 3 days. Normalization.
+# Normalization Value (from manuscript)
+cum_vdp_nodams = 21088.453521509597  # Value of dry peat volume without blocks, without precipitation for 3 days.
 
-"""
-Read and preprocess data
-"""
-# Read rasters, build up canal connectivity adjacency matrix
-if 'CNM' and 'cr' and 'c_to_r_list' not in globals(): # call only if needed
-    cnm, cr, c_to_r_list = preprocess_data.gen_can_matrix_and_raster_from_raster(
+# Read and Preprocess Data
+# Use caching to avoid re-reading if already in memory
+if 'CNM' not in globals() or 'cr' not in globals() or 'c_to_r_list' not in globals(): 
+    global CNM, cr, c_to_r_list
+    CNM, cr, c_to_r_list = preprocess_data.gen_can_matrix_and_raster_from_raster(
         can_rst_fn=can_rst_fn, dem_rst_fn=dem_rst_fn
     )
 
@@ -76,38 +84,31 @@ _, dem, peat_type_arr, peat_depth_arr = preprocess_data.read_preprocess_rasters(
     can_rst_fn, dem_rst_fn, peat_depth_rst_fn, peat_depth_rst_fn
 )
 
-# Read precipitation
-p = read.read_precipitation(rainfall_fn) # precipitation read from separate historical data
+p = read.read_precipitation(rainfall_fn)
 if len(p) < days:
     raise ValueError("Rainfall data is shorter than the specified simulation days.")
-p = p[:days] # Take only the required number of days
+p = p[:days]
 
-# Even if maps say peat depth is less than 2 meters, 
-# the impermeable bottom is at most at 2m.
-# This can potentially break the hydrological simulation if the WTD would go below 2m.
 print(">>>>> WARNING, OVERWRITING PEAT DEPTH")
 peat_depth_arr[peat_depth_arr < 2.0] = 2.0
 
-# Catchment mask: delimit the study area
+# Create Masks
 catchment_mask = np.ones(shape=dem.shape, dtype=bool)
-catchment_mask[np.where(dem < -10)] = False  # -99999.0 is current value of dem for nodata points.
+catchment_mask[np.where(dem < -10)] = False
 
-# 'Peel' the dem. Dirichlet BC will be applied at the peel.
 boundary_mask = utilities.peel_raster(dem, catchment_mask)
-
-# After peeling, catchment_mask should only be the fruit:
 catchment_mask[boundary_mask] = False
 
-# Soil types, soil physical properties, and soil depth:
 peat_type_masked = peat_type_arr * catchment_mask
-peat_bottom_elevation = - peat_depth_arr * catchment_mask  # meters with respect to dem surface. Should be negative!
+peat_bottom_elevation = - peat_depth_arr * catchment_mask
 
-# Load peatmap soil types' physical properties dictionary.
-# Kadjust is hydraulic conductivity multiplier for sapric peat
+# --- Calculate peatland area ----
+peatland_area_ha = utilities.calculate_peatland_area(peat_type_masked, 100, peat_types=peat_raster_values) 
+print(f"Peatland area: {peatland_area_ha:.2f} ha")
+
+# Hydraulic Properties
 h_to_tra_and_c_dict, _ = hydro_utils.peat_map_interp_functions(Kadjust=kadjust)
 
-# Transmissivity and storage are computed as: T(h) = T(h) - T(peat depth).
-#  These quantities are the latter
 tra_to_cut = hydro_utils.peat_map_h_to_tra(
     soil_type_mask=peat_type_masked, gwt=peat_bottom_elevation, h_to_tra_and_C_dict=h_to_tra_and_c_dict
 )
@@ -116,32 +117,30 @@ sto_to_cut = hydro_utils.peat_map_h_to_sto(
 )
 sto_to_cut = sto_to_cut * catchment_mask.ravel()
 
-# Water level in canals and list of pixels in canal network.
+# Canal Data
 srfcanlist = [dem[coords] for coords in c_to_r_list]
 n_canals = len(c_to_r_list)
-
 owtcanlist = [x - canal_water_level for x in srfcanlist]
 
-# Create the output folder
+# Create Output Folder
 output_folder = export.create_output_folder(scenario_name, days, n_blocks, n_iterations)
 
-"""
-MonteCarlo
-"""
+# Run Simulation
 for i in range(0, n_iterations):
 
     if i == 0:  # random block configurations
-        dam_location = np.random.randint(1, n_canals, n_blocks).tolist()  # Generate random kvector. 0 is not a good position in c_to_r_list
+        dam_location = np.random.randint(1, n_canals, n_blocks).tolist()  # Generate random kvector. 0 is not a valid canal in c_to_r_list
     else:
-        prohibited_node_list = [i for i, _ in enumerate(owtcanlist[1:]) if owtcanlist[1:][i] < wt_canals[1:][i]]      # [1:] is to take the 0th element out of the loop
+        prohibited_node_list = [j for j, _ in enumerate(owtcanlist[1:]) if owtcanlist[1:][j] < wt_canals[1:][j]]  # [1:] is to take the 0th element out of the loop
         candidate_node_list = np.array([e for e in range(1, n_canals) if e not in prohibited_node_list])  # remove 0 from the range of possible canals
-        dam_location = np.random.choice(candidate_node_list, size=n_blocks)
+        dam_location = np.random.choice(candidate_node_list, size=n_blocks).tolist()  # Convert to list
 
     if hand_made_dams:
         # HAND-MADE RULE OF DAM POSITIONS TO ADD:
         dam_location = hand_picked_dams
 
-    wt_canals = utilities.place_dams(owtcanlist, srfcanlist, block_height, dam_location, cnm)
+    wt_canals = utilities.place_dams(owtcanlist, srfcanlist, block_height, dam_location, CNM)
+
     """
     #########################################
                     HYDROLOGY
@@ -174,7 +173,7 @@ for i in range(0, n_iterations):
         wt_canal_arr[coords] = wt_canals[canaln]
 
     (
-        cumulative_Vdp,
+        cumulative_dry_peat_volume,
         dry_peat_volume,
         avg_wt_over_time,
         wt_track_drained,
@@ -183,96 +182,84 @@ for i in range(0, n_iterations):
         rast_D_before,
         rast_cwl_before,
         rast_dem_before,
-        rast_elev_phi_before, 
-        rast_D_after, 
+        rast_elev_phi_before,
+        rast_D_after,
         rast_cwl_after,
-        rast_elev_phi_after
+        rast_elev_phi_after,
+        avg_wtd_nday  # Get n-day average WTD from hydrology function
     ) = hydro.hydrology(
-        'transient', nx, ny, dx, dy, days, ele, phi_ini, catchment_mask, 
-        wt_canal_arr, boundary_arr, peat_type_mask=peat_type_masked, 
-        httd=h_to_tra_and_c_dict, tra_to_cut=tra_to_cut, sto_to_cut=sto_to_cut, 
-        track_WT_drained_area=wt_track_drained_area, track_WT_notdrained_area=wt_track_notdrained_area, # Pass coordinates here
+        'transient', nx, ny, dx, dy, days, ele, phi_ini, catchment_mask,
+        wt_canal_arr, boundary_arr, peat_type_mask=peat_type_masked,
+        httd=h_to_tra_and_c_dict, tra_to_cut=tra_to_cut, sto_to_cut=sto_to_cut,
+        track_WT_drained_area=wt_track_drained_area, track_WT_notdrained_area=wt_track_notdrained_area,
         diri_bc=diri_bc, neumann_bc=None, plotOpt=True, remove_ponding_water=True,
-        P=p, ET=et, dt=timestep
+        P=p, ET=et, dt=timestep, n_day_avg=dry_period, output_folder=output_folder,
+        y_value=wt_crosssection_y_val
     )
 
     water_blocked_canals = sum(np.subtract(wt_canals[1:], owtcanlist[1:]))
 
-    #cum_Vdp_nodams = 21088.453521509597 # Value of dry peat volume without any blocks, without any precipitation for 3 days. Normalization.
     print(
         'dry_peat_volume(%) = ', dry_peat_volume / cum_vdp_nodams * 100.0, '\n',
         'water_blocked_canals = ', water_blocked_canals
     )
-    
-    # Export raster data
-    raster_variables = [
-        ('rast_D_before', rast_D_before),
-        ('rast_cwl_before', rast_cwl_before),
-        ('rast_dem_before', rast_dem_before),
-        ('rast_elev_phi_before', rast_elev_phi_before),
-        ('rast_D_after', rast_D_after),
-        ('rast_cwl_after', rast_cwl_after),
-        ('rast_elev_phi_after', rast_elev_phi_after),
-    ]
-    for var_name, raster_array in raster_variables:
-        filename = f"{var_name}_{scenario_name}_{days}_{n_blocks}_{n_iterations}.tif"
-        output_path = os.path.join(output_folder, filename)
-        metadata = {'description': f'{var_name} for scenario {scenario_name}'}
-        export.export_raster_to_geotiff(raster_array, output_path, dem_rst_fn, metadata)
 
-    """
-    Final printings
-    """
-    fname = r'output/results_mc_3_cumulative.txt'
-    if n_iterations > 0:  # only if big enough number of simulated days
-        with open(fname, 'a') as output_file:
-            output_file.write(
-                "\n" + str(i) + "    " + str(dry_peat_volume) + "    "
-                + str(n_blocks) + "    " + str(n_iterations) + "    " + str(days) + "    "
-                + str(time.ctime()) + "    " + str(water_blocked_canals)
-            )
+    #  Estimate total CO2 emissions
+    avg_wtd_for_emissions = np.mean(avg_wtd_nday)  # Calculate average WTD for emissions (m)
+    co2_emissions_per_ha = (- ALPHA * avg_wtd_for_emissions) + BETA # Equation 8, in Mg ha−1 yr−1
+    total_co2_emissions = co2_emissions_per_ha * peatland_area_ha # in Mg/yr
+
+    if days < 365:
+        print("WARNING: Simulation days less than 365. CO2 emission estimates may be inaccurate.")
+    print(f"Estimated CO2 emissions: {total_co2_emissions:.2f} Mg")
+
+    # Plot water table response over time
+    export.plot_water_table_response(days, wt_track_drained, wt_track_notdrained, avg_wt_over_time, output_folder)
 
 
-"""
-Export tabular data and canal network map
-"""
-# Export timeseries data
-export.export_timeseries_to_csv(timestep_data, output_folder, scenario_name, n_blocks, days) 
+# Export Outputs
+export.export_timeseries_to_csv(timestep_data, output_folder, scenario_name, n_blocks, days)
 
-# Export simulation summary
 export.export_simulation_summary(output_folder, scenario_name, days, n_iterations, n_blocks,
-                                    i, water_blocked_canals, avg_wt_over_time, cumulative_Vdp)
-                                    
+                                    i, water_blocked_canals, avg_wt_over_time, cumulative_dry_peat_volume, 
+                                    total_co2_emissions, co2_emissions_per_ha)  # Pass the calculated value
+
 end_time = time.time()
+export.export_metadata(output_folder, scenario_name, config, start_time, end_time)
 
-# Export metadata
-export.export_metadata(output_folder, scenario_name, config, start_time, end_time) 
-
-# Export the cr array (canal network) to GeoTIFF
-cr = cr.astype(np.float32)  # Or the appropriate data type
+cr = cr.astype(np.float32)
 filename = f"cr_{scenario_name}_{days}_{n_blocks}_{n_iterations}.tif"
 output_path = os.path.join(output_folder, filename)
 metadata = {'description': f'Canal raster for scenario {scenario_name}'}
 export.export_raster_to_geotiff(cr, output_path, dem_rst_fn, metadata)
 
-"""
-Water Table Response to Drainage Over Time
-"""
-plt.figure()
-plt.plot(list(range(0, days)), wt_track_drained, label='close to drained')
-plt.plot(list(range(0, days)), wt_track_notdrained, label='away from drained')
+# Create canal block outputs (raster and/or shapefile)
+if n_blocks > 0 or hand_made_dams:
+    export.create_canal_block_outputs(
+        cr_filepath=os.path.join(output_folder, f"cr_{scenario_name}_{days}_{n_blocks}_{n_iterations}.tif"),
+        hand_picked_dams=dam_location,  # Use the actual dam locations
+        output_folder=output_folder,
+        template_raster=dem_rst_fn,
+        scenario_name=scenario_name,
+        days=days,
+        n_blocks=n_blocks,
+        n_iterations=n_iterations,
+        output_type='both'  # Generate both raster and shapefile
+    )
 
-# Conditional plotting for avg_wt_over_time with dashed red line and 50% opacity
-if isinstance(avg_wt_over_time, (int, float)):
-    plt.plot(list(range(0, days)), [avg_wt_over_time] * days, label='average',
-            linestyle='--', color='red', alpha=0.5)
-else:
-    plt.plot(list(range(0, days)), avg_wt_over_time, label='average',
-            linestyle='--', color='red', alpha=0.5)
-
-plt.xlabel('time(days)')
-plt.ylabel('WTD (m)')
-plt.title('Water Table Response to Drainage Over Time')
-plt.legend()
-plt.show()
+# Export raster data
+raster_variables = [
+    ('rast_D_before', rast_D_before),
+    ('rast_cwl_before', rast_cwl_before),
+    ('rast_dem_before', rast_dem_before),
+    ('rast_elev_phi_before', rast_elev_phi_before),
+    ('rast_D_after', rast_D_after),
+    ('rast_cwl_after', rast_cwl_after),
+    ('rast_elev_phi_after', rast_elev_phi_after),
+]
+for var_name, raster_array in raster_variables:
+    filename = f"{var_name}_{scenario_name}_{days}_{n_blocks}_{n_iterations}.tif"
+    output_path = os.path.join(output_folder, filename)
+    metadata = {'description': f'{var_name} for scenario {scenario_name}'}
+    export.export_raster_to_geotiff(raster_array, output_path, dem_rst_fn, metadata)
 

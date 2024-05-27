@@ -81,12 +81,14 @@ def export_raster_to_geotiff(raster_array, output_path, template_raster, metadat
 
 def export_simulation_summary(output_folder, scenario_name, days, n_iterations, n_blocks,
                                 i, water_blocked_canals, avg_wt_over_time, cumulative_Vdp, 
-                                total_co2_emissions=None): # Add total_co2_emissions as optional argument
+                                total_co2_emissions=None, co2_emissions_per_ha=None): 
     """Exports the overall simulation summary to a CSV file.
 
     Args:
         # ... (Your existing docstring arguments)
         total_co2_emissions (float, optional): Total annual CO2 emissions (Mg). 
+            Defaults to None (not included in summary if None).
+        co2_emissions_per_ha (float, optional): Annual CO2 emissions per hectare (Mg/ha).
             Defaults to None (not included in summary if None).
     """
     filename = f"{scenario_name}_summary_{days}_{n_blocks}_{n_iterations}.csv"
@@ -97,9 +99,11 @@ def export_simulation_summary(output_folder, scenario_name, days, n_iterations, 
         fieldnames = ['Time', 'Days', 'Iterations', 'Blocks', 'Current Iteration',
                       'Water Blocked Canals (m)', 'Avg WTD (m)', 'Cumulative Vdp (m^3)']
         
-        # Add 'Total CO2 Emissions (Mg)' to fieldnames if provided
+        # Add emissions fields if provided
         if total_co2_emissions is not None:
             fieldnames.append('Total CO2 Emissions (Mg)') 
+        if co2_emissions_per_ha is not None:
+            fieldnames.append('CO2 Emissions per ha (Mg/ha)')
         
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
@@ -116,11 +120,13 @@ def export_simulation_summary(output_folder, scenario_name, days, n_iterations, 
             'Cumulative Vdp (m^3)': f"{cumulative_Vdp:.2f}"
         }
         
-        # Add total CO2 emissions to the data row if provided
+        # Add emissions values to the data row if provided
         if total_co2_emissions is not None:
             data_row['Total CO2 Emissions (Mg)'] = f"{total_co2_emissions:.2f}" 
+        if co2_emissions_per_ha is not None:
+            data_row['CO2 Emissions per ha (Mg/ha)'] = f"{co2_emissions_per_ha:.2f}"
 
-        writer.writerow(data_row) # Write the data row
+        writer.writerow(data_row)  # Write the data row
 
 
 def export_metadata(output_folder, scenario_name, config, start_time, end_time):
@@ -184,6 +190,7 @@ def create_canal_block_outputs(cr_filepath, hand_picked_dams, output_folder, tem
         profile.update(
             dtype=canal_block_map.dtype,
             count=1,
+            nodata=255
         )
 
         # Define raster output filename and path
@@ -222,15 +229,16 @@ def create_canal_block_outputs(cr_filepath, hand_picked_dams, output_folder, tem
         gdf.to_file(shapefile_output_path, driver='ESRI Shapefile')
 
 
-def plot_water_table_response(days, wt_track_drained, wt_track_notdrained, avg_wt_over_time):
+def plot_water_table_response(days, wt_track_drained, wt_track_notdrained, avg_wt_over_time, output_folder):
     """
-    Plots the water table response to drainage over time.
+    Plots the water table response to drainage over time and saves the plot to a PNG file.
 
     Args:
         days (int): Number of days for the simulation.
         wt_track_drained (list): Water table depth (WTD) values close to the drained area over time.
         wt_track_notdrained (list): WTD values away from the drained area over time.
         avg_wt_over_time (list or float): Average WTD over time. Can be a list or a single float value.
+        output_folder (str): Path to the folder where the plot should be saved. 
     """
     plt.figure()
 
@@ -256,6 +264,11 @@ def plot_water_table_response(days, wt_track_drained, wt_track_notdrained, avg_w
 
     # Display the plot
     plt.show()
+    # Save the plot as a PNG file
+    plot_filename = "water_table_response.png"
+    plot_filepath = os.path.join(output_folder, plot_filename)
+    plt.savefig(plot_filepath)
+    plt.close() # Close the figure to release resources
 
 # Example usage:
 # plot_water_table_response(30, wt_track_drained, wt_track_notdrained, avg_wt_over_time)
