@@ -19,7 +19,7 @@ def read_params(fn=r"/data/params.xlsx"):
 def peat_depth_map(peat_depth_type_arr):
     peat_depth_arr = np.ones(shape=peat_depth_type_arr.shape)
     # information from excel
-    peat_depth_arr[peat_depth_type_arr==1] = 2. # depth in meters.
+    peat_depth_arr[peat_depth_type_arr==1] = 0 # depth in meters.
     peat_depth_arr[peat_depth_type_arr==2] = 2.
     peat_depth_arr[peat_depth_type_arr==3] = 4.
     peat_depth_arr[peat_depth_type_arr==4] = 0.
@@ -70,10 +70,10 @@ def read_preprocess_rasters(can_rst_fn, dem_rst_fn, peat_type_rst_fn, peat_depth
     
     
     # Eliminate rows and columns full of noData values.
-    dem = dem[7:-7, 5:-15] #old
-    can_arr = can_arr[7:-7, 5:-15]
-    peat_type_arr = peat_type_arr[7:-7, 5:-15]
-    peat_depth_arr = peat_depth_arr[7:-7, 5:-15]
+    # dem = dem[7:-7, 5:-15] #old
+    # can_arr = can_arr[7:-7, 5:-15]
+    # peat_type_arr = peat_type_arr[7:-7, 5:-15]
+    # peat_depth_arr = peat_depth_arr[7:-7, 5:-15]
     
     return can_arr, dem, peat_type_arr, peat_depth_arr
     
