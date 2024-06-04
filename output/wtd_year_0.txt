@@ -1,4 +1,0 @@
-
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Tue Apr 23 14:00:51 2024 nblocks = 0 ET = 3.0
-drained notdrained mean

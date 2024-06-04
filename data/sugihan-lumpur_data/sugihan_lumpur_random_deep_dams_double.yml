@@ -1,0 +1,36 @@
+general:
+  scenario_name: "sugihan_lumpur_random_dams_double" # Name of the simulation scenario
+  days: 365 # Number of days used to simulate the Monte Carlo simulations
+  n_blocks: 200 # Number of canal blocks to be placed in the peatland.
+  n_iterations: 1 #Number of iterations for the Monte Carlo simulation or optimization algorithm
+  hand_made_dams: False # Enable or disable using hand-picked dams
+  peat_raster_values: [3] # raster values of peat soil in peat_depth_rst_fn
+  
+hydrology:
+  block_height: 0.8 #The height of the canal blocks used to raise water levels, in meters (m).
+  canal_water_level: 1.2 # The initial water level in the canals, relative to the DEM elevation, in meters (m).
+  diri_bc: 0.0 #The Dirichlet boundary condition value, representing the fixed hydraulic head at the model boundaries, in meters (m).
+  hini: 0.0 #The initial hydraulic head (water level) above the DEM elevation, in meters (m).
+  P: 0.0 # Precipitation (mm/day)
+  ET: 3.0 # Evapotranspiration (mm/day)
+  timestep: 1.0 #Time step for the transient simulation (in days).
+  Kadjust: 1.5 # Hydraulic conductivity adjustment factor for sapric peat. Unitless (multiplier for hydraulic conductivity).
+  dry_period: 3 # The mean length of consecutive rainless days during the dry season in their study area
+
+co2_em: # coefficients for WTD-CO2 emissions relationship (Equation 8 and 9 in the manuscript)
+  ALPHA: 74.11  # Mg/ha/yr/m
+  BETA: 29.34   # Mg/ha/yr
+
+data:
+  dem_rst_fn: "data/sugihan-lumpur_data/SRTMV3_cubicspline.tif"
+  can_rst_fn: "data/sugihan-lumpur_data/canal_new_res.tif"
+  peat_depth_rst_fn: "data/sugihan-lumpur_data/peattype_INT1U.tif"
+  rainfall_fn: "data/sugihan-lumpur_data/2023_rainfall_plm.xlsx"
+
+dams: # New sections for dam locations
+  hand_picked_dams: [] #no hade made dams
+                     
+tracking:
+  wt_track_drained_area: [644, 371]
+  wt_track_notdrained_area: [659, 250]
+  wt_crosssection_y_val: 600

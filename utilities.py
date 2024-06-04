@@ -191,3 +191,47 @@ def place_dams(originalWT, srfc, block_height, dams_to_add, CNM):
     return wt
 
 
+def calculate_peatland_area(peat_mask, resolution, peat_types=None):
+    """
+    Calculates the peatland area from a peat mask raster, optionally considering specific peat soil types.
+
+    Args:
+        peat_mask (numpy.ndarray): A boolean or binary array where 1 or True represents peatland,
+                                   or a raster with specific values for different peat types.
+        resolution (float): The spatial resolution of the raster in meters (e.g., 100 for a 100m x 100m resolution).
+        peat_types (list of int, optional): A list of integers specifying peat soil types to include in the calculation.
+                                            Defaults to None, which counts all non-zero values.
+
+    Returns:
+        float: The peatland area in hectares.
+
+    Raises:
+        TypeError: If input types are incorrect.
+        ValueError: If input values are incorrect.
+    """
+    # Type checks
+    if not isinstance(peat_mask, np.ndarray):
+        raise TypeError("peat_mask must be a numpy.ndarray")
+    if not isinstance(resolution, (int, float)) or resolution <= 0:
+        raise ValueError("resolution must be a positive number")
+    if peat_types is not None:
+        if not isinstance(peat_types, list):
+            raise TypeError("peat_types must be a list of integers")
+        if not all(isinstance(x, int) for x in peat_types):
+            raise TypeError("peat_types must be a list of integers")
+
+    # Value check for peat_mask contents
+    if peat_mask.ndim != 2:
+        raise ValueError("peat_mask must be a 2D numpy array")
+
+    if peat_types is None:
+        # Count all non-zero pixels
+        peat_pixels = np.count_nonzero(peat_mask)
+    else:
+        # Count only pixels that match the specified peat types
+        peat_pixels = np.sum(np.isin(peat_mask, peat_types))
+
+    # Cast to float to prevent overflow
+    area_m2 = np.float64(peat_pixels) * (np.float64(resolution) ** 2)
+    area_ha = area_m2 / 10000  # Convert square meters to hectares
+    return area_ha
