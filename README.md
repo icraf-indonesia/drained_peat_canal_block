@@ -162,11 +162,13 @@ Here’s the format of a YAML file that you can modify to change the values of d
 
 ```yaml
 general:
-  days: 3 # Number of days used to simulate the Monte Carlo simulations
+  scenario_name: "sugihan_lumpur_baseline_nodams" # Name of the simulation scenario
+  days: 365 # Number of days used to simulate the Monte Carlo simulations
   n_blocks: 0 # Number of canal blocks to be placed in the peatland.
   n_iterations: 1 #Number of iterations for the Monte Carlo simulation or optimization algorithm
   hand_made_dams: False # Enable or disable using hand-picked dams
-
+  peat_raster_values: [3] # raster values of peat soil in peat_depth_rst_fn
+  
 hydrology:
   block_height: 0.4 #The height of the canal blocks used to raise water levels, in meters (m).
   canal_water_level: 1.2 # The initial water level in the canals, relative to the DEM elevation, in meters (m).
@@ -176,19 +178,25 @@ hydrology:
   ET: 3.0 # Evapotranspiration (mm/day)
   timestep: 1.0 #Time step for the transient simulation (in days).
   Kadjust: 1.5 # Hydraulic conductivity adjustment factor for sapric peat. Unitless (multiplier for hydraulic conductivity).
+  dry_period: 3 # The mean length of consecutive rainless days during the dry season in their study area
+
+co2_em: # coefficients for WTD-CO2 emissions relationship (Equation 8 and 9 in the manuscript)
+  ALPHA: 74.11  # Mg/ha/yr/m
+  BETA: 29.34   # Mg/ha/yr
 
 data:
-  dem_rst_fn: "data/original_data/DTM_metres_clip.tif"
-  can_rst_fn: "data/original_data/canals_clip.tif"
-  peat_depth_rst_fn: "data/original_data/Peattypedepth_clip.tif"
-  rainfall_fn: "data/original_data/2012_rainfall.xlsx"
+  dem_rst_fn: "data/sugihan-lumpur_data/SRTMV3_cubicspline.tif"
+  can_rst_fn: "data/sugihan-lumpur_data/canal_new_res.tif"
+  peat_depth_rst_fn: "data/sugihan-lumpur_data/peattype_INT1U.tif"
+  rainfall_fn: "data/sugihan-lumpur_data/2023_rainfall_plm.xlsx"
 
 dams: # New sections for dam locations
-  hand_picked_dams: [6959, 901, 945, 9337, 10089, 7627, 1637, 7863, 7148, 7138, 3450, 1466, 420, 4608, 4303, 6908, 9405, 8289, 7343, 2534, 9349, 6272, 8770, 2430, 2654, 6225, 11152, 118, 4013, 3381, 6804, 6614, 7840, 9839, 5627, 3819, 7971, 402, 6974, 7584, 3188, 8316, 1521, 856, 770, 6504, 707, 5478, 5512, 1732, 3635, 1902, 2912, 9220, 1496, 11003, 8371, 10393, 2293, 4901, 5892, 6110, 2118, 4485, 6379, 10300, 6451, 5619, 9871, 9502, 1737, 4368, 7290, 9071, 11222, 3085, 2013, 5226, 597, 5038]
+  hand_picked_dams: [] #no hade made dams
                      
 tracking:
-  track_WT_drained_area: [239, 166]
-  track_WT_notdrained_area: [522, 190]
+  wt_track_drained_area: [644, 371]
+  wt_track_notdrained_area: [659, 250]
+  wt_crosssection_y_val: 600
 ```
 
 ## How to simulate canal blocking?
