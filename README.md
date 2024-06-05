@@ -108,11 +108,11 @@ This should print the path to the Python executable in the `canal-block` environ
     b.  Ensure the `main.py` tab is selected.
     c.  Run the model and wait for the output.
 
-    ![*Spyder Interface*](src/images/spyder.png)
+    ![*Spyder Interface*](scripts/images/spyder.png)
 
     A successful run will produce a plot similar to the one below.
 
-    ![*Plot Result from Model*](src/images/plot-after-computation.png)
+    ![*Plot Result from Model*](scripts/images/plot-after-computation.png)
 
     The model output includes four main maps: `DEM`, canal water level (`CWL`), `D`, and `elevation-phi`. The DEM shows the height of the peat surface and helps understand water flow and how canal blocks affect water levels. The `CWL` measures water in the canal network, starting out even but changing after blocks are added, which then affects the water table depth (WTD) in the model. The parameter `D` indicates transmissivity, showing how easily water moves through the peat, based on the slope between the WTD and the peat surface. The elevation-phi plot shows the difference between land height and WTD, with positive values indicating areas where dry peat can form.
 
@@ -123,7 +123,7 @@ This should print the path to the Python executable in the `canal-block` environ
 The script needs the following data to run.
 
 | No  | Data                                  | Type    | Format  | Parameter           | Description                                                                                                                                                                                                                                                                                                                                                   | Unit                                     |
-|--------|--------|--------|--------|--------|------------------------|--------|
+|----------|----------|----------|----------|----------|---------------|----------|
 | 1   | Elevation map                         | Raster  | GeoTIFF | `dem_rst_fn`        | elevation data for the entire study area                                                                                                                                                                                                                                                                                                                      | meters (*m*)                             |
 | 2   | Peat canal network map                | Raster  | GeoTIFF | `can_rst_fn`        | indicates the location of canals within the study area                                                                                                                                                                                                                                                                                                        | integer (*1:canal present & 0:no canal*) |
 | 3   | Peat depth and soil type map          | Raster  | GeoTIFF | `peat_depth_rst_fn` | information about the depth of the peat layer at each location                                                                                                                                                                                                                                                                                                | meters (*m*)                             |
@@ -133,7 +133,7 @@ The script needs the following data to run.
 In addition to the required data, several parameters must be defined to run the model. These parameters need to be set in a YAML file before running the model. The parameters should be adjusted according to the simulation scenario that the user wants to run. The following table lists these parameters as defined in the YAML file.
 
 | No  | Parameter Name                                         | Description                                                                                                                                                                                                                 | Format                              | Unit                                |
-|------------|------------|-------------------------|------------|------------|
+|-------------|-------------|--------------------|-------------|-------------|
 | 1   | `DAYS`                                                 | Number of days to simulate the model                                                                                                                                                                                        | Integer                             | days                                |
 | 2   | `N_BLOCKS`                                             | Number of canal blocks to be placed in the peatland                                                                                                                                                                         | Integer                             | number of blocks                    |
 | 3   | `N_ITER`                                               | Number of iterations for the Monte Carlo simulation or optimization algorithm, influencing the search for optimal dam placements. In the case of Monte Carlo, this specifies how many random dam configurations to evaluate | Integer                             | number of iterations or generations |
@@ -160,7 +160,7 @@ Here’s the format of a YAML file that you can modify to change the values of d
 
 *The parameters are grouped under sections like "general", "hydrology”, "data", and “dams”, making them easy to understand and modify.*
 
-```yaml
+``` yaml
 general:
   scenario_name: "sugihan_lumpur_baseline_nodams" # Name of the simulation scenario
   days: 365 # Number of days used to simulate the Monte Carlo simulations
@@ -213,7 +213,7 @@ This model can simulate peat water table depth with or without canal blocking. T
 
 When the `hand_made_dams` parameter is set to `True`, the process to select the canal block is illustrated by the following steps. First, the canal network raster, which contains cell values of 1 for canals and 0 for non-canals, is reclassified. All cells with a value of 1 are then reclassified to unique numbers in ascending order. The numerical value of each canal cell in the reclassified raster is then used to pick the location of the canal block. Finally, the selected number is inputted into the model for the parameter `hand_picked_dams`.
 
-![*Canal blocking location selection ilustration*](images/canal%20block%20picked%20illustration.png)
+![*Canal blocking location selection ilustration*](scripts/images/canal block picked illustration.png)
 
 ## Reference
 
