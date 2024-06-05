@@ -1,6 +1,6 @@
 # Drained Peat Canal Block Simulator
 
-The Drained Peat Canal Block Simulator is an open-source model modified from a research by Urzainki et al. (2020). The original model by Urzainki et al. is a tropical peat hydrological model designed to simulate the effect of canal blocking on peat water table depth. This model has the potential to inform the impact of peatland restoration efforts in drained tropical peatlands through canal blocking, which can consequently lead to reduced peat decomposition and a subsequent reduction in GHG emissions.
+The Drained Peat Canal Block Simulator is an open-source model modified from a research by [Urzainki et al. (2020)](https://bg.copernicus.org/articles/17/4769/2020/bg-17-4769-2020.html). The original model by Urzainki et al. is a tropical peat hydrological model designed to simulate the effect of canal blocking on peat water table depth. This model has the potential to inform the impact of peatland restoration efforts in drained tropical peatlands through canal blocking, which can consequently lead to reduced peat decomposition and a subsequent reduction in GHG emissions.The source code of the original version can be accessed [here](https://github.com/LukeEcomod/blopti).
 
 This repository, the Drained Peat Canal Block Simulator, aims to extend the functionalities of the original model. It makes running simulations and managing multiple canal-blocking scenarios more structured, easier to track, and simpler to compare results across different scenarios. Additionally, we have enhanced the outputs of the simulations by adding new features, including various plots, graphs, and maps that illustrate the impact of canal blocking on changes in water table depth (WTD) and GHG emissions.
 
@@ -33,7 +33,7 @@ After installing Miniconda, open the Anaconda Prompt from your Start Menu.
 Use the following command to create the conda environment from the `canal-block_environment.yml` file. Make sure the `.yml` file is in your current directory or provide the full path to the file.
 
 ``` sh
-conda env create -f canal-block_environment.yml
+conda env create -f https://github.com/icraf-indonesia/drained_peat_canal_block/blob/main/data/peat_canal_block_environment.yml
 ```
 
 ### Step 5: Activate the Conda Environment
@@ -41,7 +41,7 @@ conda env create -f canal-block_environment.yml
 Once the environment is created, activate it using the following command:
 
 ``` sh
-conda activate canal-block
+conda activate canal-block_environment
 ```
 
 You can verify the installation by checking the list of installed packages:
@@ -108,11 +108,11 @@ This should print the path to the Python executable in the `canal-block` environ
     b.  Ensure the `main.py` tab is selected.
     c.  Run the model and wait for the output.
 
-    ![*Spyder Interface*](scripts/images/spyder.png)
+    ![*Spyder Interface*](data/images/spyder.png)
 
     A successful run will produce a plot similar to the one below.
 
-    ![*Plot Result from Model*](scripts/images/plot-after-computation.png)
+    ![*Plot Result from Model*](data/images/plot-after-computation.png)
 
     The model output includes four main maps: `DEM`, canal water level (`CWL`), `D`, and `elevation-phi`. The DEM shows the height of the peat surface and helps understand water flow and how canal blocks affect water levels. The `CWL` measures water in the canal network, starting out even but changing after blocks are added, which then affects the water table depth (WTD) in the model. The parameter `D` indicates transmissivity, showing how easily water moves through the peat, based on the slope between the WTD and the peat surface. The elevation-phi plot shows the difference between land height and WTD, with positive values indicating areas where dry peat can form.
 
@@ -213,7 +213,7 @@ This model can simulate peat water table depth with or without canal blocking. T
 
 When the `hand_made_dams` parameter is set to `True`, the process to select the canal block is illustrated by the following steps. First, the canal network raster, which contains cell values of 1 for canals and 0 for non-canals, is reclassified. All cells with a value of 1 are then reclassified to unique numbers in ascending order. The numerical value of each canal cell in the reclassified raster is then used to pick the location of the canal block. Finally, the selected number is inputted into the model for the parameter `hand_picked_dams`.
 
-![*Canal blocking location selection ilustration*](scripts/images/canal block picked illustration.png)
+![*Canal blocking location selection ilustration*](data/images/canal block picked illustration.png)
 
 ## Reference
 
