@@ -133,7 +133,7 @@ The script needs the following data to run.
 In addition to the required data, several parameters must be defined to run the model. These parameters need to be set in a YAML file before running the model. The parameters should be adjusted according to the simulation scenario that the user wants to run. The following table lists these parameters as defined in the YAML file.
 
 | No  | Parameter Name                                         | Description                                                                                                                                                                                                                 | Format                              | Unit                                |
-|--------------|--------------|----------------|--------------|--------------|
+|---------------|---------------|---------------|---------------|---------------|
 | 1   | `DAYS`                                                 | Number of days to simulate the model                                                                                                                                                                                        | Integer                             | days                                |
 | 2   | `N_BLOCKS`                                             | Number of canal blocks to be placed in the peatland                                                                                                                                                                         | Integer                             | number of blocks                    |
 | 3   | `N_ITER`                                               | Number of iterations for the Monte Carlo simulation or optimization algorithm, influencing the search for optimal dam placements. In the case of Monte Carlo, this specifies how many random dam configurations to evaluate | Integer                             | number of iterations or generations |
@@ -213,7 +213,7 @@ This model can simulate peat water table depth with or without canal blocking. T
 
 When the `hand_made_dams` parameter is set to `True`, the process to select the canal block is illustrated by the following steps. First, the canal network raster, which contains cell values of 1 for canals and 0 for non-canals, is reclassified. All cells with a value of 1 are then reclassified to unique numbers in ascending order. The numerical value of each canal cell in the reclassified raster is then used to pick the location of the canal block. Finally, the selected number is inputted into the model for the parameter `hand_picked_dams`.
 
-![*Canal blocking location selection ilustration*](data/images/canal block picked illustration.png)
+![*Canal blocking location selection ilustration*](data/images/canal_block_picked_illustration.png)
 
 ## Reference
 
