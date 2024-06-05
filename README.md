@@ -30,11 +30,12 @@ After installing Miniconda, open the Anaconda Prompt from your Start Menu.
 
 ### Step 4: Create a New Conda Environment
 
-Use the following command to create the conda environment from the `canal-block_environment.yml` file. Make sure the `.yml` file is in your current directory or provide the full path to the file.
+Use the following command to create the conda environment from the `canal-block_environment.yml` file we provided, you can download [here](https://github.com/icraf-indonesia/drained_peat_canal_block/blob/main/data/peat_canal_block_environment.yml). Make sure the `.yml` file is in your current directory or provide the full path to the file.
 
 ``` sh
-conda env create -f https://github.com/icraf-indonesia/drained_peat_canal_block/blob/main/data/peat_canal_block_environment.yml
+conda env create -f [path to downloaded environment file]/canal-block_environment.yml
 ```
+Replace [path to downloaded environment file] with the actual path where the YAML file is downloaded.
 
 ### Step 5: Activate the Conda Environment
 
